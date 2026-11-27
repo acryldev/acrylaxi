@@ -4,17 +4,25 @@ import eslintConfigPrettier from "eslint-config-prettier/flat";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
 
-export default defineConfig(js.configs.recommended, eslintConfigPrettier, {
-  files: ["**/*.js"],
-  ignores: ["dist/", "node_modules/", ".lavish-axi/", "lavish-code-review.html"],
-  languageOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
-    globals: {
-      ...globals.node,
+export default defineConfig(
+  {
+    // Generated build output, runtime state, and the vendored/upstream trees this
+    // repository does not own (the `upstream/` submodule and the marketing project).
+    ignores: ["dist/", "node_modules/", ".acrylaxi/", "acrylaxi-code-review.html", "upstream/", "marketing/"],
+  },
+  js.configs.recommended,
+  eslintConfigPrettier,
+  {
+    files: ["**/*.js", "**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     },
   },
-  rules: {
-    "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-  },
-});
+);

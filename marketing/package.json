@@ -1,0 +1,13 @@
+{
+  "name": "acrylaxi-explainer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "npx -y hyperframes@0.9.102 check --json",
+    "lint": "npx -y hyperframes@0.9.102 lint",
+    "snapshot": "npx -y hyperframes@0.9.102 snapshot --at 4,15.6,24,33,40,52,58,67 --no-end",
+    "render": "npx -y hyperframes@0.9.102 render --quality delivery -o renders/acrylaxi-explainer.mp4",
+    "derivatives": "bash scripts/build-derivatives.sh",
+    "preview": "npx -y hyperframes@0.9.102 preview"
+  }
+}

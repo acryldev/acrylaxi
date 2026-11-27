@@ -2,10 +2,10 @@ import os from "node:os";
 
 import { isWildcardHost } from "./paths.js";
 
-export const DISCOVER_ALL_INTERFACES_ENV = "LAVISH_AXI_DISCOVER_ALL_INTERFACES";
+export const DISCOVER_ALL_INTERFACES_ENV = "ACRYLAXI_DISCOVER_ALL_INTERFACES";
 
 // The addresses server discovery dials, in preference order: the control hosts (the CLI's
-// configured host and loopback), then - only when LAVISH_AXI_DISCOVER_ALL_INTERFACES=1 - every
+// configured host and loopback), then - only when ACRYLAXI_DISCOVER_ALL_INTERFACES=1 - every
 // other local interface address. Every server since 0.1.78 binds loopback first as the port lock,
 // so a current server is always found at loopback. The sweep only finds a 0.1.77-or-older server
 // pinned to a Tailscale or LAN address alone, and costs a TCP connect to every VPN, tunnel, and
@@ -27,7 +27,7 @@ export function discoveryHosts(controlHosts, { env = process.env, interfaces } =
   return hosts;
 }
 
-// Every concrete address on this machine's interfaces that a Lavish server could be listening on.
+// Every concrete address on this machine's interfaces that an Acrylaxi server could be listening on.
 // Server replacement uses it to drop inherited addresses that left the machine, and the opt-in
 // discovery sweep dials it. IPv6 link-local addresses need a zone to be dialed and are skipped.
 // Older Node releases report `family` as a number.

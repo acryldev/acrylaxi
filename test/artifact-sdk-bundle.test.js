@@ -92,8 +92,8 @@ function createElement(tag) {
       // A new Reveal drops the previous marker by querying the shadow root for its class, so that
       // query answers with the markers actually appended there.
       shadowRoot.querySelectorAll = (selector) =>
-        selector === ".lavish-reveal-marker"
-          ? shadowRoot.children.filter((child) => child.className === "lavish-reveal-marker")
+        selector === ".acrylaxi-reveal-marker"
+          ? shadowRoot.children.filter((child) => child.className === "acrylaxi-reveal-marker")
           : [];
       element.shadowRoot = shadowRoot;
       return shadowRoot;
@@ -176,7 +176,7 @@ function bootSdk({
   const documentElement = createElement("html");
   const head = createElement("head");
   const body = createElement("body");
-  if (htmlAnnotate !== null) documentElement.setAttribute("data-lavish-annotate", htmlAnnotate);
+  if (htmlAnnotate !== null) documentElement.setAttribute("data-acrylaxi-annotate", htmlAnnotate);
   appendTo(documentElement, head);
   appendTo(documentElement, body);
   for (const element of revisionMarkElements) appendTo(body, element);
@@ -196,7 +196,7 @@ function bootSdk({
     },
     URL: {
       createObjectURL() {
-        return "blob:lavish-test";
+        return "blob:acrylaxi-test";
       },
       revokeObjectURL() {},
     },
@@ -216,9 +216,9 @@ function bootSdk({
       createElement,
       getElementById: () => null,
       querySelector: (selector) =>
-        selector === "script[data-lavish-revisions]" ? revisionsScript : documentQuery(selector),
+        selector === "script[data-acrylaxi-revisions]" ? revisionsScript : documentQuery(selector),
       querySelectorAll: (selector) =>
-        selector === "[data-lavish-revision]"
+        selector === "[data-acrylaxi-revision]"
           ? revisionMarkElements
           : structuralQueries
             ? queryChildChain(documentElement, selector)
@@ -249,7 +249,7 @@ function bootSdk({
     Element: sandbox.Element,
     posted,
     body,
-    api: sandbox.window.lavish,
+    api: sandbox.window.acrylaxi,
     // The SDK checks `instanceof Element`, so a stub that must pass that check takes this prototype.
     asElement(stub) {
       return Object.setPrototypeOf(stub, sandbox.Element.prototype);
@@ -337,7 +337,7 @@ function bootSdk({
     revealMarkers() {
       return documentElement.children
         .flatMap((child) => child.shadowRoot?.children || [])
-        .filter((child) => child.className === "lavish-reveal-marker");
+        .filter((child) => child.className === "acrylaxi-reveal-marker");
     },
     // The chrome is the only legitimate sender, so its messages arrive with `source: parent`.
     sendChromeMessage(data) {
@@ -348,7 +348,7 @@ function bootSdk({
     cards() {
       return documentElement.children
         .flatMap((child) => child.shadowRoot?.children || [])
-        .filter((child) => child.className === "lavish-annotation-card");
+        .filter((child) => child.className === "acrylaxi-annotation-card");
     },
     card() {
       const card = this.cards().at(-1);
@@ -358,7 +358,7 @@ function bootSdk({
     queue(text) {
       const card = this.card();
       card.querySelector("textarea").value = text;
-      card.querySelector(".lavish-send").onclick();
+      card.querySelector(".acrylaxi-send").onclick();
       return posted.at(-1);
     },
   };
@@ -376,7 +376,7 @@ for (const { label, attributes, enabled } of [
     const target = appendTo(sdk.body, cell("p", "Decision board"));
     assert.equal(sdk.click(target).defaultPrevented, enabled);
     assert.equal(sdk.cards().length, enabled ? 1 : 0);
-    const mode = sdk.posted.find((message) => message.type === "lavish:annotationMode");
+    const mode = sdk.posted.find((message) => message.type === "acrylaxi:annotationMode");
     assert.ok(mode, "the SDK reports the initial mode to the chrome");
     assert.equal(mode.enabled, enabled);
     assert.equal(mode.artifact_load_token, "load-token");
@@ -390,13 +390,13 @@ test("a page that declares off reports no review state at boot", () => {
   const sdk = bootSdk({ htmlAnnotate: "off" });
   sdk.runTimers();
   assert.equal(
-    sdk.posted.some((message) => message.type === "lavish:reviewState"),
+    sdk.posted.some((message) => message.type === "acrylaxi:reviewState"),
     false,
     "nothing was open, so there is no card state to retire",
   );
   const target = appendTo(sdk.body, cell("h1", "Headline"));
   sdk.sendChromeMessage({
-    type: "lavish:restoreReviewState",
+    type: "acrylaxi:restoreReviewState",
     state: { card: { selector: "h1", text: "needs a shorter headline" }, fields: [] },
   });
   sdk.setDocumentQuery((selector) => (selector === "h1" ? target : null));
@@ -408,15 +408,15 @@ test("the chrome can turn annotation on and off after a page declares off", () =
   const sdk = bootSdk({ htmlAnnotate: "off" });
   const target = appendTo(sdk.body, cell("p", "Decision board"));
   assert.equal(sdk.click(target).defaultPrevented, false);
-  sdk.sendChromeMessage({ type: "lavish:setAnnotationMode", enabled: true });
+  sdk.sendChromeMessage({ type: "acrylaxi:setAnnotationMode", enabled: true });
   assert.equal(sdk.click(target).defaultPrevented, true);
   assert.equal(sdk.cards().length, 1);
-  sdk.sendChromeMessage({ type: "lavish:setAnnotationMode", enabled: false });
+  sdk.sendChromeMessage({ type: "acrylaxi:setAnnotationMode", enabled: false });
   assert.equal(sdk.click(target).defaultPrevented, false);
   // This harness retains closed cards; no new card should appear while disabled.
   assert.equal(sdk.cards().length, 1);
   sdk.runTimers();
-  const state = sdk.posted.filter((message) => message.type === "lavish:reviewState").at(-1);
+  const state = sdk.posted.filter((message) => message.type === "acrylaxi:reviewState").at(-1);
   assert.equal(state.state.card, null, "turning annotation off closes the active card");
 });
 
@@ -448,7 +448,7 @@ function assertMarkerAtSettledRect(sdk) {
 
 test("reveal keeps the smooth scroll and moves the marker to the settled rect frame by frame", () => {
   const { sdk, scroll, calls } = bootRevealTarget();
-  sdk.sendChromeMessage({ type: "lavish:revealElement", selector: "#revised" });
+  sdk.sendChromeMessage({ type: "acrylaxi:revealElement", selector: "#revised" });
   assert.equal(calls.length, 1);
   assert.equal(calls[0].behavior, "smooth");
   scroll.settled = true;
@@ -458,8 +458,8 @@ test("reveal keeps the smooth scroll and moves the marker to the settled rect fr
 
 test("a reveal marker stops tracking once it is removed or replaced", () => {
   const { sdk, scroll } = bootRevealTarget();
-  sdk.sendChromeMessage({ type: "lavish:revealElement", selector: "#revised" });
-  sdk.sendChromeMessage({ type: "lavish:revealElement", selector: "#revised" });
+  sdk.sendChromeMessage({ type: "acrylaxi:revealElement", selector: "#revised" });
+  sdk.sendChromeMessage({ type: "acrylaxi:revealElement", selector: "#revised" });
   assert.equal(sdk.revealMarkers().length, 1, "a new reveal replaces the previous marker at once");
   const readsBeforeFrame = scroll.reads;
   sdk.runFrames();
@@ -492,12 +492,12 @@ test("a requested layout diagnostic publishes even when the result is unchanged"
   const sdk = bootSdk({ runAnimationFrames: true });
 
   await sdk.runAllTimers();
-  const first = sdk.posted.filter((message) => message.type === "lavish:layoutDiagnostics");
+  const first = sdk.posted.filter((message) => message.type === "acrylaxi:layoutDiagnostics");
   assert.equal(first.length, 1);
 
-  sdk.sendChromeMessage({ type: "lavish:requestLayoutDiagnostics" });
+  sdk.sendChromeMessage({ type: "acrylaxi:requestLayoutDiagnostics" });
   await sdk.runAllTimers();
-  const diagnostics = sdk.posted.filter((message) => message.type === "lavish:layoutDiagnostics");
+  const diagnostics = sdk.posted.filter((message) => message.type === "acrylaxi:layoutDiagnostics");
   assert.equal(diagnostics.length, 2);
   assert.equal(diagnostics[1].artifact_pass_sequence, diagnostics[0].artifact_pass_sequence + 1);
   assert.deepEqual(diagnostics[1].findings, diagnostics[0].findings);
@@ -506,10 +506,10 @@ test("a requested layout diagnostic publishes even when the result is unchanged"
 test("the served SDK echoes the snapshot request id", () => {
   const sdk = bootSdk();
 
-  sdk.sendChromeMessage({ type: "lavish:requestSnapshot", snapshot_request_id: "snapshot-17" });
+  sdk.sendChromeMessage({ type: "acrylaxi:requestSnapshot", snapshot_request_id: "snapshot-17" });
 
   const response = sdk.posted.at(-1);
-  assert.equal(response.type, "lavish:snapshot");
+  assert.equal(response.type, "acrylaxi:snapshot");
   assert.equal(response.snapshot_request_id, "snapshot-17");
   assert.equal(response.artifact_load_token, "load-token");
 });
@@ -523,12 +523,12 @@ test("the served SDK bundle reports the artifact's own revision registry and mar
     { id: "r1", label: "Tightened header copy", summary: "Shortened the hero headline" },
   ]);
   const marked = createElement("h1");
-  marked.setAttribute("data-lavish-revision", "r1");
+  marked.setAttribute("data-acrylaxi-revision", "r1");
   marked.textContent = "Ship faster";
 
   const sdk = bootSdk({ revisionsScript, revisionMarkElements: [marked] });
 
-  const message = sdk.posted.find((entry) => entry.type === "lavish:revisions");
+  const message = sdk.posted.find((entry) => entry.type === "acrylaxi:revisions");
   assert.ok(message, "the SDK reports the revision registry on load");
   assert.equal(message.revisions.length, 1);
   assert.equal(message.revisions[0].id, "r1");
@@ -547,7 +547,7 @@ test("the served SDK bundle queues a table-cell annotation without a missing-hel
   sdk.click(evidence);
   const message = sdk.queue("Check this permission");
 
-  assert.equal(message.type, "lavish:queuePrompt");
+  assert.equal(message.type, "acrylaxi:queuePrompt");
   assert.equal(message.prompt.prompt, "Check this permission");
   assert.deepEqual(
     { ...message.prompt.target },
@@ -681,7 +681,7 @@ test("Escape leaves an annotation card with an in-flight attachment open, even w
 
   sdk.click(paragraph);
   const card = sdk.card();
-  const attachInput = card.querySelector(".lavish-attach-input");
+  const attachInput = card.querySelector(".acrylaxi-attach-input");
   // Never resolves - only the synchronous "uploading" status addFiles sets is needed here.
   attachInput.files = [{ name: "shot.png", type: "image/png", size: 10, arrayBuffer: () => new Promise(() => {}) }];
   const changeListener = attachInput.listeners.find((entry) => entry.type === "change");
@@ -703,20 +703,20 @@ test("the served SDK bundle reports a draft whose anchor the artifact no longer 
   const sdk = bootSdk();
 
   sdk.sendChromeMessage({
-    type: "lavish:restoreReviewState",
+    type: "acrylaxi:restoreReviewState",
     state: { card: { selector: "#hero", text: "needs a shorter headline" }, fields: [] },
   });
 
   // The load event proves the document parsed, not that it finished rendering, so nothing is
   // reported until the anchor has had time to appear.
   assert.equal(
-    sdk.posted.some((message) => message.type === "lavish:reviewDraftUnrestorable"),
+    sdk.posted.some((message) => message.type === "acrylaxi:reviewDraftUnrestorable"),
     false,
   );
 
   sdk.runTimers();
   const report = sdk.posted.at(-1);
-  assert.equal(report.type, "lavish:reviewDraftUnrestorable");
+  assert.equal(report.type, "acrylaxi:reviewDraftUnrestorable");
   assert.equal(report.selector, "#hero");
   assert.equal(report.artifact_load_token, "load-token");
 });
@@ -729,14 +729,14 @@ test("the served SDK bundle restores a draft whose anchor arrives after the load
   sdk.setDocumentQuery((selector) => (selector === "#hero" ? late : null));
 
   sdk.sendChromeMessage({
-    type: "lavish:restoreReviewState",
+    type: "acrylaxi:restoreReviewState",
     state: { card: { selector: "#hero", text: "needs a shorter headline" }, fields: [] },
   });
   late = appendTo(sdk.body, cell("h1", "Headline"));
   sdk.runTimers();
 
   assert.equal(
-    sdk.posted.some((message) => message.type === "lavish:reviewDraftUnrestorable"),
+    sdk.posted.some((message) => message.type === "acrylaxi:reviewDraftUnrestorable"),
     false,
     "an anchor that arrived late is restored, not reported gone",
   );
@@ -747,8 +747,8 @@ test("the served SDK bundle reports nothing when there is no draft to restore", 
   const sdk = bootSdk();
   const before = sdk.posted.length;
 
-  sdk.sendChromeMessage({ type: "lavish:restoreReviewState", state: { card: null, fields: [] } });
-  sdk.sendChromeMessage({ type: "lavish:restoreReviewState", state: { card: { selector: "#hero", text: "  " } } });
+  sdk.sendChromeMessage({ type: "acrylaxi:restoreReviewState", state: { card: null, fields: [] } });
+  sdk.sendChromeMessage({ type: "acrylaxi:restoreReviewState", state: { card: { selector: "#hero", text: "  " } } });
   sdk.runTimers();
 
   assert.equal(sdk.posted.length, before);
@@ -763,7 +763,7 @@ test("the served SDK bundle leaves a card the user opened alone when the anchor 
   sdk.setDocumentQuery((selector) => (selector === "#hero" ? late : null));
 
   sdk.sendChromeMessage({
-    type: "lavish:restoreReviewState",
+    type: "acrylaxi:restoreReviewState",
     state: { card: { selector: "#hero", text: "needs a shorter headline" }, fields: [] },
   });
 
@@ -777,7 +777,7 @@ test("the served SDK bundle leaves a card the user opened alone when the anchor 
   // The draft is still stored on the chrome side, so a later load can try again; nothing here
   // claims the anchor is gone either.
   assert.equal(
-    sdk.posted.some((message) => message.type === "lavish:reviewDraftUnrestorable"),
+    sdk.posted.some((message) => message.type === "acrylaxi:reviewDraftUnrestorable"),
     false,
   );
 });
@@ -792,13 +792,13 @@ test("the served SDK bundle drops a late restore once the user has opened a card
   sdk.setDocumentQuery((selector) => (selector === "#hero" ? late : null));
 
   sdk.sendChromeMessage({
-    type: "lavish:restoreReviewState",
+    type: "acrylaxi:restoreReviewState",
     state: { card: { selector: "#hero", text: "needs a shorter headline" }, fields: [] },
   });
 
   const paragraph = appendTo(sdk.body, cell("p", "Just prose"));
   sdk.click(paragraph);
-  sdk.card().querySelector(".lavish-cancel").onclick();
+  sdk.card().querySelector(".acrylaxi-cancel").onclick();
   const cardsAfterCancel = sdk.cards().length;
 
   late = appendTo(sdk.body, cell("h1", "Headline"));
@@ -807,7 +807,7 @@ test("the served SDK bundle drops a late restore once the user has opened a card
   assert.equal(sdk.cards().length, cardsAfterCancel, "the cancelled card is not replaced by a restored one");
   assert.notEqual(sdk.card().querySelector("textarea").value, "needs a shorter headline");
   assert.equal(
-    sdk.posted.some((message) => message.type === "lavish:reviewDraftUnrestorable"),
+    sdk.posted.some((message) => message.type === "acrylaxi:reviewDraftUnrestorable"),
     false,
   );
 });
@@ -817,7 +817,7 @@ test("clicking an element with a queued note asks the chrome to edit it instead 
   const paragraph = appendTo(sdk.body, cell("p", "Just prose"));
   sdk.click(paragraph);
   const queued = sdk.queue("Reword this");
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [queued.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [queued.prompt.selector] });
   // The stub shadow root keeps closed cards, so a new card shows as a higher count.
   const cardsBefore = sdk.cards().length;
 
@@ -825,7 +825,7 @@ test("clicking an element with a queued note asks the chrome to edit it instead 
 
   assert.equal(sdk.cards().length, cardsBefore);
   const message = sdk.posted.at(-1);
-  assert.equal(message.type, "lavish:editQueuedAnchor");
+  assert.equal(message.type, "acrylaxi:editQueuedAnchor");
   assert.equal(message.selector, queued.prompt.selector);
   assert.equal(message.artifact_load_token, "load-token");
 });
@@ -835,8 +835,8 @@ test("an element whose queued note left the queue opens a fresh card again", () 
   const paragraph = appendTo(sdk.body, cell("p", "Just prose"));
   sdk.click(paragraph);
   const queued = sdk.queue("Reword this");
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [queued.prompt.selector] });
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [queued.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [] });
   const cardsBefore = sdk.cards().length;
 
   sdk.click(paragraph);
@@ -849,7 +849,7 @@ test("the chrome can hand an element click back for a fresh card", () => {
   const paragraph = appendTo(sdk.body, cell("p", "Just prose"));
   sdk.setDocumentQuery((selector) => (selector === "body > p" ? paragraph : null));
 
-  sdk.sendChromeMessage({ type: "lavish:annotateElement", selector: "body > p" });
+  sdk.sendChromeMessage({ type: "acrylaxi:annotateElement", selector: "body > p" });
 
   assert.match(sdk.card().innerHTML, /Annotate &lt;p&gt;/);
 });
@@ -876,7 +876,7 @@ test("a note queued from a diagram node's label opens again from the node's shap
   sdk.click(label);
   const queued = sdk.queue("Rename this step");
   sdk.sendChromeMessage({
-    type: "lavish:queuedAnchors",
+    type: "acrylaxi:queuedAnchors",
     selectors: [queued.prompt.selector, queued.prompt.target.selector],
   });
   const cardsBefore = sdk.cards().length;
@@ -885,7 +885,7 @@ test("a note queued from a diagram node's label opens again from the node's shap
 
   assert.equal(sdk.cards().length, cardsBefore);
   const message = sdk.posted.at(-1);
-  assert.equal(message.type, "lavish:editQueuedAnchor");
+  assert.equal(message.type, "acrylaxi:editQueuedAnchor");
   assert.equal(message.selector, queued.prompt.target.selector);
 });
 
@@ -897,17 +897,17 @@ test("a note queued on a diagram node itself opens again from the node's shape",
   const { label, shape } = buildMermaidNode(sdk);
   const node = label.parentElement;
   sdk.setDocumentQuery((selector) => (selector === "g#flowchart-A-0" ? node : null));
-  sdk.sendChromeMessage({ type: "lavish:annotateElement", selector: "g#flowchart-A-0" });
+  sdk.sendChromeMessage({ type: "acrylaxi:annotateElement", selector: "g#flowchart-A-0" });
   const queued = sdk.queue("Rename this step");
   assert.equal(queued.prompt.selector, queued.prompt.target.selector);
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [queued.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [queued.prompt.selector] });
   const cardsBefore = sdk.cards().length;
 
   sdk.click(shape);
 
   assert.equal(sdk.cards().length, cardsBefore);
   const message = sdk.posted.at(-1);
-  assert.equal(message.type, "lavish:editQueuedAnchor");
+  assert.equal(message.type, "acrylaxi:editQueuedAnchor");
   assert.equal(message.selector, queued.prompt.selector);
 });
 
@@ -928,14 +928,14 @@ test("a click inside a diagram node reopens the clicked element's own note befor
     notes.push(sdk.queue(text).prompt);
   }
   sdk.sendChromeMessage({
-    type: "lavish:queuedAnchors",
+    type: "acrylaxi:queuedAnchors",
     selectors: [...new Set(notes.flatMap((prompt) => [prompt.selector, prompt.target.selector]))],
   });
 
   sdk.click(label);
 
   const message = sdk.posted.at(-1);
-  assert.equal(message.type, "lavish:editQueuedAnchor");
+  assert.equal(message.type, "acrylaxi:editQueuedAnchor");
   assert.equal(message.selector, notes[1].selector);
 });
 
@@ -949,7 +949,7 @@ test("a click inside a table cell opens only the note on the exact element click
   sdk.click(strong);
   const strongNote = sdk.queue("Explain this app");
   sdk.sendChromeMessage({
-    type: "lavish:queuedAnchors",
+    type: "acrylaxi:queuedAnchors",
     selectors: [cellNote.prompt.selector, strongNote.prompt.selector],
   });
   const cardsBefore = sdk.cards().length;
@@ -957,7 +957,7 @@ test("a click inside a table cell opens only the note on the exact element click
   sdk.click(em);
 
   assert.equal(sdk.cards().length, cardsBefore + 1);
-  assert.notEqual(sdk.posted.at(-1)?.type, "lavish:editQueuedAnchor");
+  assert.notEqual(sdk.posted.at(-1)?.type, "acrylaxi:editQueuedAnchor");
 });
 
 // In annotate mode a plain click on a link annotates it, so Ctrl-click (Cmd-click on macOS) is the
@@ -1029,14 +1029,14 @@ test("Ctrl-click follows a link even when the link already has a queued note", (
   const { link } = buildLink(sdk);
   sdk.click(link);
   const queued = sdk.queue("Is this the right spec?");
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [queued.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [queued.prompt.selector] });
   const postedBefore = sdk.posted.length;
 
   const event = sdk.click(link, { ctrlKey: true });
 
   assert.equal(event.defaultPrevented, false);
   assert.equal(
-    sdk.posted.slice(postedBefore).some((message) => message.type === "lavish:editQueuedAnchor"),
+    sdk.posted.slice(postedBefore).some((message) => message.type === "acrylaxi:editQueuedAnchor"),
     false,
   );
 });
@@ -1069,13 +1069,13 @@ test("structurally identical deep elements get distinct selectors and their own 
 
   sdk.click(images[0]);
   const first = sdk.queue("Swap this photo");
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [first.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [first.prompt.selector] });
   const cardsBefore = sdk.cards().length;
 
   sdk.click(images[1]);
 
   assert.equal(sdk.cards().length, cardsBefore + 1, "the second image opens a fresh card");
-  assert.notEqual(sdk.posted.at(-1)?.type, "lavish:editQueuedAnchor");
+  assert.notEqual(sdk.posted.at(-1)?.type, "acrylaxi:editQueuedAnchor");
   const second = sdk.queue("Crop this one");
   assert.notEqual(second.prompt.selector, first.prompt.selector);
   assert.deepEqual(queryChildChain(sdk.body.parentElement, first.prompt.selector), [images[0]]);
@@ -1156,14 +1156,14 @@ test("a queued note reopens after an identical branch is added beside it", () =>
   sdk.click(original);
   const queued = sdk.queue("Swap this photo");
   const twin = build();
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [queued.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [queued.prompt.selector] });
   const cardsBefore = sdk.cards().length;
 
   sdk.click(original);
 
   assert.equal(sdk.cards().length, cardsBefore);
   const message = sdk.posted.at(-1);
-  assert.equal(message.type, "lavish:editQueuedAnchor");
+  assert.equal(message.type, "acrylaxi:editQueuedAnchor");
   assert.equal(message.selector, queued.prompt.selector);
 
   // The new twin is not the element the note resolves to, so it opens a fresh card.
@@ -1188,10 +1188,10 @@ test("snapshot does not query the document for selector uniqueness", () => {
     return realQuery(selector);
   };
 
-  sdk.sendChromeMessage({ type: "lavish:requestSnapshot", snapshot_request_id: "s-1" });
+  sdk.sendChromeMessage({ type: "acrylaxi:requestSnapshot", snapshot_request_id: "s-1" });
 
   const response = sdk.posted.at(-1);
-  assert.equal(response.type, "lavish:snapshot");
+  assert.equal(response.type, "acrylaxi:snapshot");
   assert.match(response.snapshot, /section/);
   assert.deepEqual(queries, []);
 });
@@ -1212,16 +1212,16 @@ test("a queued note follows its element when an identical branch is inserted bef
   const copy = build();
   sdk.body.children.splice(sdk.body.children.indexOf(copy.section), 1);
   sdk.body.children.unshift(copy.section);
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [queued.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [queued.prompt.selector] });
   const cardsBefore = sdk.cards().length;
 
   sdk.click(copy.img);
   assert.equal(sdk.cards().length, cardsBefore + 1);
-  assert.notEqual(sdk.posted.at(-1)?.type, "lavish:editQueuedAnchor");
+  assert.notEqual(sdk.posted.at(-1)?.type, "acrylaxi:editQueuedAnchor");
 
   sdk.click(original);
   const message = sdk.posted.at(-1);
-  assert.equal(message.type, "lavish:editQueuedAnchor");
+  assert.equal(message.type, "acrylaxi:editQueuedAnchor");
   assert.equal(message.selector, queued.prompt.selector);
 });
 
@@ -1239,17 +1239,17 @@ test("a click reopens the newer of two notes queued on one element whose selecto
   sdk.api.queuePrompt("Shorten this", { element: paragraph, queueKey: "" });
   const newer = sdk.posted.at(-1).prompt;
   assert.notEqual(newer.selector, older.selector);
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [older.selector, newer.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [older.selector, newer.selector] });
 
   sdk.click(paragraph);
 
   const message = sdk.posted.at(-1);
-  assert.equal(message.type, "lavish:editQueuedAnchor");
+  assert.equal(message.type, "acrylaxi:editQueuedAnchor");
   assert.equal(message.selector, newer.selector);
 });
 
 // A note the chrome cannot open (it is Sending) answers the reopen click with
-// `lavish:annotateElement` and the note's stored selector. The fresh card must open on the
+// `acrylaxi:annotateElement` and the note's stored selector. The fresh card must open on the
 // element the note was queued from, not on the inserted copy that selector now matches first.
 test("a fresh card for a note that cannot open lands on its element, not the copy its selector now names first", () => {
   const sdk = bootSdk({ structuralQueries: true });
@@ -1268,7 +1268,7 @@ test("a fresh card for a note that cannot open lands on its element, not the cop
   sdk.body.children.unshift(copy.section);
   assert.equal(queryChildChain(sdk.body.parentElement, queued.prompt.selector)[0], copy.img);
 
-  sdk.sendChromeMessage({ type: "lavish:annotateElement", selector: queued.prompt.selector });
+  sdk.sendChromeMessage({ type: "acrylaxi:annotateElement", selector: queued.prompt.selector });
   const fresh = sdk.queue("Crop this one");
 
   assert.deepEqual(queryChildChain(sdk.body.parentElement, fresh.prompt.selector), [original]);
@@ -1282,13 +1282,13 @@ test("after a reload a queued note reopens on the element its selector names", (
   const queued = before.queue("Reword this");
   const sdk = bootSdk({ structuralQueries: true });
   const reloaded = appendTo(sdk.body, cell("p", "Just prose"));
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [queued.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [queued.prompt.selector] });
   const cardsBefore = sdk.cards().length;
 
   sdk.click(reloaded);
 
   assert.equal(sdk.cards().length, cardsBefore);
-  assert.equal(sdk.posted.at(-1).type, "lavish:editQueuedAnchor");
+  assert.equal(sdk.posted.at(-1).type, "acrylaxi:editQueuedAnchor");
   assert.equal(sdk.posted.at(-1).selector, queued.prompt.selector);
 });
 
@@ -1297,13 +1297,13 @@ test("after a reload a queued note reopens on the element its selector names", (
 test("after a reload a queued selector that names only the clicked element reopens its note", () => {
   const sdk = bootSdk({ structuralQueries: true });
   const paragraph = appendTo(sdk.body, cell("p", "Just prose"));
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: ["body > p"] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: ["body > p"] });
   const cardsBefore = sdk.cards().length;
 
   sdk.click(paragraph);
 
   assert.equal(sdk.cards().length, cardsBefore);
-  assert.equal(sdk.posted.at(-1).type, "lavish:editQueuedAnchor");
+  assert.equal(sdk.posted.at(-1).type, "acrylaxi:editQueuedAnchor");
   assert.equal(sdk.posted.at(-1).selector, "body > p");
 });
 
@@ -1321,12 +1321,16 @@ test("a text note queued inside an element does not make a click there reopen an
   // The drag-select's own click, which the SDK swallows.
   sdk.click(other);
   sdk.queue("Fix this wording");
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [elementNote.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [elementNote.prompt.selector] });
   const cardsBefore = sdk.cards().length;
 
   sdk.click(other);
 
-  assert.notEqual(sdk.posted.at(-1)?.type, "lavish:editQueuedAnchor", "the text note reopened another element's note");
+  assert.notEqual(
+    sdk.posted.at(-1)?.type,
+    "acrylaxi:editQueuedAnchor",
+    "the text note reopened another element's note",
+  );
   assert.equal(sdk.cards().length, cardsBefore + 1);
 });
 
@@ -1340,12 +1344,12 @@ test("a queued note whose element was removed does not reopen on the element now
   paragraph.isConnected = false;
   sdk.body.children.splice(sdk.body.children.indexOf(paragraph), 1);
   const other = appendTo(sdk.body, cell("p", "Other text"));
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [queued.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [queued.prompt.selector] });
   const cardsBefore = sdk.cards().length;
 
   sdk.click(other);
 
-  assert.notEqual(sdk.posted.at(-1)?.type, "lavish:editQueuedAnchor", "another element reopened the note");
+  assert.notEqual(sdk.posted.at(-1)?.type, "acrylaxi:editQueuedAnchor", "another element reopened the note");
   assert.equal(sdk.cards().length, cardsBefore + 1);
 });
 
@@ -1355,12 +1359,12 @@ test("after a reload a queued selector reopens its note only when it names exact
   const sdk = bootSdk({ structuralQueries: true });
   const first = appendTo(sdk.body, cell("p", "Just prose"));
   appendTo(sdk.body, cell("p", "Just prose"));
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: ["body > p"] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: ["body > p"] });
   const cardsBefore = sdk.cards().length;
 
   sdk.click(first);
 
-  assert.notEqual(sdk.posted.at(-1)?.type, "lavish:editQueuedAnchor", "an ambiguous selector reopened the note");
+  assert.notEqual(sdk.posted.at(-1)?.type, "acrylaxi:editQueuedAnchor", "an ambiguous selector reopened the note");
   assert.equal(sdk.cards().length, cardsBefore + 1);
 });
 
@@ -1380,9 +1384,9 @@ test("a selector longer than 300 chars is queued whole and still reopens its not
   assert.ok(queued.prompt.selector.length > 300, `selector is ${queued.prompt.selector.length} chars`);
   assert.deepEqual(queryChildChain(sdk.body.parentElement, queued.prompt.selector), [images[1]]);
 
-  sdk.sendChromeMessage({ type: "lavish:queuedAnchors", selectors: [queued.prompt.selector] });
+  sdk.sendChromeMessage({ type: "acrylaxi:queuedAnchors", selectors: [queued.prompt.selector] });
   sdk.click(images[1]);
-  assert.equal(sdk.posted.at(-1).type, "lavish:editQueuedAnchor");
+  assert.equal(sdk.posted.at(-1).type, "acrylaxi:editQueuedAnchor");
   assert.equal(sdk.posted.at(-1).selector, queued.prompt.selector);
 });
 
@@ -1399,10 +1403,10 @@ test("snapshot does not query the document for a diagram node's selector", () =>
     return realQuery(selector);
   };
 
-  sdk.sendChromeMessage({ type: "lavish:requestSnapshot", snapshot_request_id: "s-1" });
+  sdk.sendChromeMessage({ type: "acrylaxi:requestSnapshot", snapshot_request_id: "s-1" });
 
   const response = sdk.posted.at(-1);
-  assert.equal(response.type, "lavish:snapshot");
+  assert.equal(response.type, "acrylaxi:snapshot");
   assert.match(response.snapshot, /mermaid-node/);
   assert.match(response.snapshot, /Start/);
   assert.deepEqual(queries, []);
@@ -1411,11 +1415,11 @@ test("snapshot does not query the document for a diagram node's selector", () =>
 test("setDocumentMeta posts the title and icon the page asked for, stamped with the load token", () => {
   const sdk = bootSdk();
   sdk.api.setDocumentMeta({ title: "(1) Board", icon: "data:image/svg+xml,<svg/>" });
-  const message = sdk.posted.find((entry) => entry.type === "lavish:documentMeta");
+  const message = sdk.posted.find((entry) => entry.type === "acrylaxi:documentMeta");
   assert.deepEqual(
     { ...message },
     {
-      type: "lavish:documentMeta",
+      type: "acrylaxi:documentMeta",
       title: "(1) Board",
       icon: "data:image/svg+xml,<svg/>",
       artifact_load_token: "load-token",
@@ -1428,7 +1432,7 @@ test("setDocumentMeta forwards null to restore, omits unset fields and drops non
   sdk.api.setDocumentMeta({ title: null });
   sdk.api.setDocumentMeta({ icon: 42, title: { toString: () => "x" } });
   sdk.api.setDocumentMeta();
-  const messages = sdk.posted.filter((entry) => entry.type === "lavish:documentMeta");
+  const messages = sdk.posted.filter((entry) => entry.type === "acrylaxi:documentMeta");
   assert.deepEqual(
     messages.map((entry) => JSON.parse(JSON.stringify({ title: entry.title, icon: entry.icon }))),
     [{ title: null }, {}, {}],

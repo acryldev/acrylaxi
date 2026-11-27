@@ -19,7 +19,7 @@ test("check script runs all verification commands", async () => {
 
 test("committed skill matches the generator stub", async () => {
   const { createSkillMarkdown } = await import("../src/skill.js");
-  const committed = await readFile(new URL("../skills/lavish/SKILL.md", import.meta.url), "utf8");
+  const committed = await readFile(new URL("../skills/acrylaxi/SKILL.md", import.meta.url), "utf8");
 
   assert.equal(committed, createSkillMarkdown(), "run `npm run build:skill` and commit the result");
 });
@@ -27,7 +27,7 @@ test("committed skill matches the generator stub", async () => {
 test("published package includes the installable skill", async () => {
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
-  assert.ok(packageJson.files.includes("skills/lavish"));
+  assert.ok(packageJson.files.includes("skills/acrylaxi"));
 });
 
 test("published package root is a complete Agent Plugin", async () => {
@@ -36,7 +36,7 @@ test("published package root is a complete Agent Plugin", async () => {
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
   assert.ok(packageJson.files.includes("plugin.json"));
-  assert.ok(packageJson.files.includes("skills/lavish"));
+  assert.ok(packageJson.files.includes("skills/acrylaxi"));
 });
 
 test("release-please keeps the plugin manifest version in step with the package", async () => {
@@ -45,16 +45,16 @@ test("release-please keeps the plugin manifest version in step with the package"
   assert.deepEqual(config.packages["."]["extra-files"], [{ type: "json", path: "plugin.json", jsonpath: "$.version" }]);
 });
 
-test("lavish-design agent skill is marked internal for skills CLI discovery", async () => {
-  const skillMd = await readFile(new URL("../.agents/skills/lavish-design/SKILL.md", import.meta.url), "utf8");
+test("acryl-design agent skill is marked internal for skills CLI discovery", async () => {
+  const skillMd = await readFile(new URL("../.agents/skills/acryl-design/SKILL.md", import.meta.url), "utf8");
   const frontmatter = skillMd.slice(4, skillMd.indexOf("\n---\n", 4));
 
-  assert.match(frontmatter, /^name: lavish-design$/m);
+  assert.match(frontmatter, /^name: acryl-design$/m);
   assert.match(frontmatter, /^metadata:\n {2}internal: true$/m);
 });
 
-test("public lavish skill is not marked internal", async () => {
-  const skillMd = await readFile(new URL("../skills/lavish/SKILL.md", import.meta.url), "utf8");
+test("public acrylaxi skill is not marked internal", async () => {
+  const skillMd = await readFile(new URL("../skills/acrylaxi/SKILL.md", import.meta.url), "utf8");
   const frontmatter = skillMd.slice(4, skillMd.indexOf("\n---\n", 4));
 
   assert.doesNotMatch(frontmatter, /^metadata:\n {2}internal: true$/m);
@@ -71,9 +71,9 @@ test("build copies local design assets for published artifact injection", async 
 test("package metadata matches the GitHub repository used for npm provenance", async () => {
   const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
-  assert.equal(packageJson.repository.url, "git+https://github.com/kunchenguid/lavish-axi.git");
-  assert.equal(packageJson.bugs.url, "https://github.com/kunchenguid/lavish-axi/issues");
-  assert.equal(packageJson.homepage, "https://github.com/kunchenguid/lavish-axi#readme");
+  assert.equal(packageJson.repository.url, "git+https://github.com/acryldev/acrylaxi.git");
+  assert.equal(packageJson.bugs.url, "https://github.com/acryldev/acrylaxi/issues");
+  assert.equal(packageJson.homepage, "https://github.com/acryldev/acrylaxi#readme");
 });
 
 test("pnpm lock root importer matches the publish manifest", async () => {
@@ -97,11 +97,13 @@ test("release workflow publishes from the release tag checkout", async () => {
   );
 });
 
-test("release workflow keeps telemetry env during npm publish prepack", async () => {
+test("release workflow keeps opt-in telemetry env during npm publish prepack", async () => {
   const workflow = await readFile(new URL("../.github/workflows/release-please.yml", import.meta.url), "utf8");
 
-  assert.match(
-    workflow,
-    /run: npm publish --access public --provenance\n\s+if: \$\{\{ steps\.release\.outputs\.release_created \}\}\n\s+env:\n\s+LAVISH_AXI_UMAMI_HOST: https:\/\/a\.kunchenguid\.com\n\s+LAVISH_AXI_UMAMI_WEBSITE_ID: \$\{\{ vars\.LAVISH_AXI_UMAMI_WEBSITE_ID \}\}/,
-  );
+  // No built-in endpoint: the host and the website id both come from repo variables, so an
+  // unconfigured release build never reports anywhere.
+  const publishStep = workflow.match(/run: npm publish[\s\S]*$/)?.[0] ?? "";
+  assert.match(publishStep, /ACRYLAXI_UMAMI_HOST: \$\{\{ vars\.ACRYLAXI_UMAMI_HOST \}\}/);
+  assert.match(publishStep, /ACRYLAXI_UMAMI_WEBSITE_ID: \$\{\{ vars\.ACRYLAXI_UMAMI_WEBSITE_ID \}\}/);
+  assert.doesNotMatch(workflow, /ACRYLAXI_UMAMI_HOST: https?:\/\//, "no default third-party telemetry endpoint");
 });

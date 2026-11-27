@@ -1,9 +1,10 @@
 dist
 node_modules
-.lavish
-.lavish-axi
+.acrylaxi
+upstream
+marketing
 .no-mistakes
-lavish-code-review.html
+acrylaxi-code-review.html
 package-lock.json
 CHANGELOG.md
 plugin.json
@@ -11,3 +12,6 @@ plugin.json
 .claude/settings.local.json
 # Canonical two-line @AGENTS.md pointer; prettier would add a blank line.
 CLAUDE.md
+# Prettier has no parser for ignore lists, so skip them instead of failing the gate.
+.gitignore
+.prettierignore

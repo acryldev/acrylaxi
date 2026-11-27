@@ -1,8 +1,7 @@
 node_modules/
 dist/
 coverage/
-.lavish/
-.lavish-axi/
+.acrylaxi/
 # Agent runtime state. `.omc/skills/**` is the one committable exception.
 /.omc/*
 !/.omc/skills/
@@ -11,3 +10,6 @@ coverage/
 package-lock.json
 .no-mistakes/evidence/
 /.planning/
+# HyperFrames working state (rendered deliverables in marketing/renders are kept)
+marketing/.hyperframes/
+marketing/node_modules/

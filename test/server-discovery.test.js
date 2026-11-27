@@ -19,7 +19,7 @@ import { serve } from "../src/server.js";
 const UNBINDABLE_HOST = "192.0.2.1";
 
 // A second concrete address on this machine, standing in for the Tailscale or LAN address one
-// agent pins with LAVISH_AXI_HOST while another agent on the same machine sets nothing.
+// agent pins with ACRYLAXI_HOST while another agent on the same machine sets nothing.
 function otherLocalIpv4() {
   for (const entries of Object.values(networkInterfaces())) {
     for (const entry of entries || []) {
@@ -30,7 +30,7 @@ function otherLocalIpv4() {
 }
 
 async function withTempDir(fn) {
-  const dir = await mkdtemp(path.join(tmpdir(), "lavish-discovery-"));
+  const dir = await mkdtemp(path.join(tmpdir(), "acrylaxi-discovery-"));
   try {
     return await fn(dir);
   } finally {
@@ -68,20 +68,20 @@ async function withEnv(overrides, fn) {
 
 function cliEnv(dir, port, host) {
   return {
-    LAVISH_AXI_PORT: String(port),
-    LAVISH_AXI_HOST: host,
-    LAVISH_AXI_STATE_DIR: dir,
-    LAVISH_AXI_NO_OPEN: "1",
-    LAVISH_AXI_TELEMETRY: "0",
-    LAVISH_AXI_IDLE_TIMEOUT_MS: "60000",
-    LAVISH_AXI_DISCOVER_ALL_INTERFACES: undefined,
+    ACRYLAXI_PORT: String(port),
+    ACRYLAXI_HOST: host,
+    ACRYLAXI_STATE_DIR: dir,
+    ACRYLAXI_NO_OPEN: "1",
+    ACRYLAXI_TELEMETRY: "0",
+    ACRYLAXI_IDLE_TIMEOUT_MS: "60000",
+    ACRYLAXI_DISCOVER_ALL_INTERFACES: undefined,
   };
 }
 
 // The opt-in sweep that also dials every other local interface address. These tests stand in for a
 // 0.1.77-or-older server pinned to a Tailscale or LAN address alone, which only the sweep can find.
 function sweepEnv(dir, port, host) {
-  return { ...cliEnv(dir, port, host), LAVISH_AXI_DISCOVER_ALL_INTERFACES: "1" };
+  return { ...cliEnv(dir, port, host), ACRYLAXI_DISCOVER_ALL_INTERFACES: "1" };
 }
 
 // The CLI prints its TOON result to stdout; these tests assert on server and state effects instead.
@@ -307,7 +307,7 @@ test(
         port,
         stateFile: path.join(dir, "state.json"),
         version: "9.9.9-test",
-        env: { LAVISH_AXI_HOST: otherHost },
+        env: { ACRYLAXI_HOST: otherHost },
         log: (line) => logs.push(line),
         idleTimeoutMs: null,
         bindRecoveryDelaysMs: [100],
@@ -391,7 +391,7 @@ test(
   },
 );
 
-test("a second server for a port whose loopback a Lavish server owns refuses to start", async (t) => {
+test("a second server for a port whose loopback an Acrylaxi server owns refuses to start", async (t) => {
   const otherHost = otherLocalIpv4();
   if (!otherHost) {
     t.skip("host has no non-loopback IPv4 address");
@@ -414,11 +414,11 @@ test("a second server for a port whose loopback a Lavish server owns refuses to 
           port: owner.port,
           stateFile: path.join(dir, "state.json"),
           version: "9.9.9-test",
-          env: { LAVISH_AXI_HOST: otherHost },
+          env: { ACRYLAXI_HOST: otherHost },
           log: () => {},
           idleTimeoutMs: null,
         }),
-        /Another Lavish server .* already owns port/,
+        /Another Acrylaxi server .* already owns port/,
       );
       // The loser must not have taken the other address on its way out: a split daemon pair on one
       // port is exactly what the loopback owner check exists to prevent.
@@ -444,7 +444,7 @@ test("a foreign loopback listener prevents a pinned server from claiming the sam
         port,
         stateFile: path.join(dir, "state.json"),
         version: "9.9.9-test",
-        env: { LAVISH_AXI_HOST: otherHost },
+        env: { ACRYLAXI_HOST: otherHost },
         log: () => {},
         idleTimeoutMs: null,
       }).then(
@@ -474,7 +474,7 @@ test("a symlinked state directory adopts the daemon started at its target", asyn
       port,
       stateFile: path.join(dir, "state.json"),
       version: VERSION,
-      env: { LAVISH_AXI_HOST: "127.0.0.1" },
+      env: { ACRYLAXI_HOST: "127.0.0.1" },
       detectTailscale: null,
       log: () => {},
       idleTimeoutMs: null,
@@ -530,7 +530,7 @@ test(
 );
 
 test(
-  "switching LAVISH_AXI_HOST from loopback to another address replaces the server once and keeps its sessions",
+  "switching ACRYLAXI_HOST from loopback to another address replaces the server once and keeps its sessions",
   { timeout: 30_000 },
   async (t) => {
     const otherHost = otherLocalIpv4();
@@ -546,7 +546,7 @@ test(
         port,
         stateFile: path.join(dir, "state.json"),
         version: VERSION,
-        env: { LAVISH_AXI_HOST: "127.0.0.1" },
+        env: { ACRYLAXI_HOST: "127.0.0.1" },
         log: () => {},
         idleTimeoutMs: null,
       });
@@ -577,7 +577,7 @@ test(
 );
 
 test(
-  "switching LAVISH_AXI_HOST from another address to loopback adopts the running server",
+  "switching ACRYLAXI_HOST from another address to loopback adopts the running server",
   { timeout: 20_000 },
   async (t) => {
     const otherHost = otherLocalIpv4();
@@ -593,7 +593,7 @@ test(
         port,
         stateFile: path.join(dir, "state.json"),
         version: VERSION,
-        env: { LAVISH_AXI_HOST: otherHost },
+        env: { ACRYLAXI_HOST: otherHost },
         log: () => {},
         idleTimeoutMs: null,
       });
@@ -732,7 +732,7 @@ test(
         log: () => {},
         idleTimeoutMs: null,
       });
-      const otherInstallDir = await mkdtemp(path.join(tmpdir(), "lavish-discovery-other-"));
+      const otherInstallDir = await mkdtemp(path.join(tmpdir(), "acrylaxi-discovery-other-"));
       const otherInstall = await serve({
         port,
         stateFile: path.join(otherInstallDir, "state.json"),
@@ -791,7 +791,7 @@ test(
 test("another installation's server on loopback is never used or stopped", { timeout: 20_000 }, async () => {
   await withTempDir(async (dir) => {
     const artifact = await writeArtifact(dir);
-    const otherInstallDir = await mkdtemp(path.join(tmpdir(), "lavish-discovery-other-"));
+    const otherInstallDir = await mkdtemp(path.join(tmpdir(), "acrylaxi-discovery-other-"));
     const port = await freePort();
     const otherInstall = await serve({
       port,
@@ -839,7 +839,7 @@ test(
       const old = createHttpServer((req, res) => {
         if (req.url?.startsWith("/health")) {
           res.writeHead(200, { "content-type": "application/json" });
-          res.end(JSON.stringify({ ok: true, app: "lavish-axi", version: "0.1.77" }));
+          res.end(JSON.stringify({ ok: true, app: "acrylaxi", version: "0.1.77" }));
           return;
         }
         if (req.method === "POST" && req.url === "/shutdown") shutdowns += 1;
@@ -917,7 +917,7 @@ test(
       const artifact = await writeArtifact(dir);
       const port = await freePort(otherHost);
       // A loopback-only server of this installation that another CLI restarts every time this one
-      // shuts it down: after each /shutdown it answers like a Lavish server still starting (503),
+      // shuts it down: after each /shutdown it answers like an Acrylaxi server still starting (503),
       // which frees the port for this CLI's probes but makes the server it spawns stand down.
       let shutdowns = 0;
       let startingUntil = 0;
@@ -928,10 +928,10 @@ test(
           res.end(
             JSON.stringify(
               starting
-                ? { ok: false, app: "lavish-axi", version: VERSION }
+                ? { ok: false, app: "acrylaxi", version: VERSION }
                 : {
                     ok: true,
-                    app: "lavish-axi",
+                    app: "acrylaxi",
                     version: VERSION,
                     state_id: stateId(path.join(dir, "state.json")),
                     hosts: ["127.0.0.1"],
@@ -953,7 +953,7 @@ test(
         assert.equal(shutdowns, 2, "expected the initial replacement plus exactly one retry");
         assert.match(output, /SERVER_ERROR/);
         assert.ok(output.includes(otherHost), `expected the missing address in ${output}`);
-        assert.match(output, /lavish-axi stop/);
+        assert.match(output, /acrylaxi stop/);
       } finally {
         await new Promise((resolve) => loopbackOnly.close(() => resolve(undefined)));
         await shutdownAt(otherHost, port);
@@ -1032,7 +1032,7 @@ test(
         port,
         stateFile: path.join(dir, "state.json"),
         version: "0.0.1",
-        env: { LAVISH_AXI_HOST: otherHost },
+        env: { ACRYLAXI_HOST: otherHost },
         extraListenHosts: ["::1"],
         log: () => {},
         idleTimeoutMs: null,
@@ -1080,7 +1080,7 @@ test(
         port,
         stateFile: path.join(dir, "state.json"),
         version: "0.0.1",
-        env: { LAVISH_AXI_HOST: otherHost },
+        env: { ACRYLAXI_HOST: otherHost },
         log: () => {},
         idleTimeoutMs: null,
       });
@@ -1112,7 +1112,7 @@ test(
   async () => {
     await withTempDir(async (dir) => {
       const artifact = await writeArtifact(dir);
-      const unresolvable = "lavish-unresolvable.invalid";
+      const unresolvable = "acrylaxi-unresolvable.invalid";
       const port = await freePort();
       const loopbackOnly = await serve({
         port,
@@ -1224,13 +1224,13 @@ test(
     await withTempDir(async (dir) => {
       const artifact = await writeArtifact(dir);
       const port = await freePort(otherHost);
-      const name = "lavish-recovering.test";
+      const name = "acrylaxi-recovering.test";
       let dnsUp = false;
       const server = await serve({
         port,
         stateFile: path.join(dir, "state.json"),
         version: VERSION,
-        env: { LAVISH_AXI_HOST: name },
+        env: { ACRYLAXI_HOST: name },
         lookupHost: async (host) => {
           if (host !== name) return [{ address: host, family: host.includes(":") ? 6 : 4 }];
           if (!dnsUp) throw Object.assign(new Error(`getaddrinfo ENOTFOUND ${host}`), { code: "ENOTFOUND" });
@@ -1265,7 +1265,7 @@ function lsofAvailable() {
 }
 
 // A child process listening at host:port. The script's file name is what `ps` shows, so a
-// pre-handshake Lavish server is one whose name says lavish-axi and an unrelated one is not.
+// pre-handshake Acrylaxi server is one whose name says acrylaxi and an unrelated one is not.
 async function spawnListener(dir, name, host, port, source) {
   const script = path.join(dir, name);
   await writeFile(script, source);
@@ -1290,7 +1290,7 @@ test("stopping a pre-handshake server signals only the process at its own addres
     // Answers /health with no app or version and has no /shutdown, like the oldest releases.
     const preHandshake = await spawnListener(
       dir,
-      "lavish-axi-pre-handshake.mjs",
+      "acrylaxi-pre-handshake.mjs",
       "127.0.0.1",
       port,
       `import { createServer } from "node:http";
@@ -1345,9 +1345,7 @@ test("discovery dials no other local address unless the interface sweep is enabl
       await withEnv(cliEnv(dir, port, undefined), () => runCli(["stop"]));
       assert.equal(connections, 0, "default discovery dialed a non-loopback interface address");
 
-      await withEnv({ ...cliEnv(dir, port, undefined), LAVISH_AXI_DISCOVER_ALL_INTERFACES: "1" }, () =>
-        runCli(["stop"]),
-      );
+      await withEnv({ ...cliEnv(dir, port, undefined), ACRYLAXI_DISCOVER_ALL_INTERFACES: "1" }, () => runCli(["stop"]));
       assert.ok(connections > 0, "the opt-in sweep did not dial the other local address");
     } finally {
       await closeRaw(recorder);
@@ -1371,15 +1369,15 @@ os.networkInterfaces = () => ({ ...networkInterfaces(), blackhole: [{ address: "
     const started = Date.now();
     const child = spawn(
       process.execPath,
-      [fileURLToPath(new URL("../bin/lavish-axi.js", import.meta.url)), "stop", "--port", String(port)],
+      [fileURLToPath(new URL("../bin/acrylaxi.js", import.meta.url)), "stop", "--port", String(port)],
       {
         env: {
           ...process.env,
           NODE_OPTIONS: `--import=${pathToFileURL(preload).href}`,
-          LAVISH_AXI_STATE_DIR: dir,
-          LAVISH_AXI_TELEMETRY: "0",
-          LAVISH_AXI_HOST: "127.0.0.1",
-          LAVISH_AXI_DISCOVER_ALL_INTERFACES: "1",
+          ACRYLAXI_STATE_DIR: dir,
+          ACRYLAXI_TELEMETRY: "0",
+          ACRYLAXI_HOST: "127.0.0.1",
+          ACRYLAXI_DISCOVER_ALL_INTERFACES: "1",
         },
         stdio: ["ignore", "pipe", "pipe"],
       },

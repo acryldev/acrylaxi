@@ -1,0 +1,807 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--panel);
+      font-family: var(--sans);
+      color: var(--ink);
+    }
+    #root *,
+    #root *::before,
+    #root *::after {
+      box-sizing: border-box;
+    }
+
+    .s6-chrome {
+      position: absolute;
+      top: 92px;
+      left: 120px;
+      right: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 50;
+    }
+    .s6-chrome .note {
+      font-family: var(--mono);
+      font-size: 17px;
+      letter-spacing: 0.14em;
+      color: var(--ink-4);
+      text-transform: uppercase;
+    }
+    .s6-prog {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+    .s6-prog .bar {
+      width: 34px;
+      height: 4px;
+      background: #dededa;
+    }
+    .s6-prog .bar.on {
+      background: var(--ink);
+    }
+
+    .s6-beat {
+      position: absolute;
+      inset: 0;
+    }
+    .s6-copy {
+      position: absolute;
+      left: 120px;
+      top: 300px;
+      width: 690px;
+    }
+    .s6-copy .eyebrow {
+      margin-bottom: 22px;
+    }
+    .s6-copy h3 {
+      margin: 0 0 18px 0;
+      font-size: 62px;
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1.04;
+      color: var(--ink);
+    }
+    .s6-copy p {
+      margin: 0 0 26px 0;
+      font-size: 26px;
+      line-height: 1.44;
+      color: var(--ink-3);
+      letter-spacing: -0.008em;
+      max-width: 620px;
+    }
+    .s6-copy .detail {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--mono);
+      font-size: 16px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      border-top: 1px solid var(--hair);
+      padding-top: 16px;
+      min-width: 300px;
+    }
+    .s6-copy .detail i {
+      width: 26px;
+      height: 3px;
+      background: var(--grad);
+    }
+    .s6-count {
+      position: absolute;
+      left: 120px;
+      bottom: 84px;
+      font-family: var(--mono);
+      font-size: 16px;
+      letter-spacing: 0.16em;
+      color: var(--ink-4);
+    }
+
+    /* ── beat A: phone ──────────────────────────────────────────── */
+    .s6-phone {
+      position: absolute;
+      left: 1140px;
+      top: 150px;
+      width: 420px;
+      height: 800px;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      padding: 16px 12px 12px 12px;
+    }
+    .s6-notch {
+      width: 110px;
+      height: 6px;
+      background: var(--ink);
+      margin: 0 auto 14px auto;
+    }
+    .s6-screen {
+      position: relative;
+      height: 100%;
+      border: 1px solid var(--hair);
+      padding: 20px 18px;
+      overflow: hidden;
+    }
+    .s6-screen .ph-k {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      margin-bottom: 9px;
+    }
+    .s6-screen .ph-h {
+      font-size: 29px;
+      font-weight: 500;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      margin-bottom: 15px;
+    }
+    .s6-screen .ph-l {
+      height: 7px;
+      background: #ecebe7;
+      margin-bottom: 8px;
+    }
+    .s6-screen .ph-l.w1 {
+      width: 84%;
+    }
+    .s6-screen .ph-l.w2 {
+      width: 62%;
+    }
+    .s6-screen .ph-sec {
+      margin: 22px 0 10px 0;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+    }
+    .s6-screen .ph-panel {
+      border: 1px solid var(--hair);
+      padding: 4px 12px;
+    }
+    .s6-screen .ph-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 9px 0;
+      border-top: 1px solid #f0efec;
+      font-size: 18px;
+      color: var(--ink-2);
+    }
+    .s6-screen .ph-row:first-child {
+      border-top: 0;
+    }
+    .s6-screen .ph-row span:last-child {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--ink);
+    }
+    .s6-screen .ph-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .s6-screen .ph-card {
+      border: 1px solid var(--hair);
+      height: 96px;
+      padding: 10px;
+    }
+    .s6-screen .ph-card .cl {
+      height: 5px;
+      background: #ecebe7;
+      margin-bottom: 7px;
+    }
+    .s6-screen .ph-card .cl.w {
+      width: 70%;
+    }
+    .s6-screen .ph-card.sel {
+      position: relative;
+      border: 1px dashed #6b6b65;
+    }
+    .s6-screen .ph-badge {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      width: 26px;
+      height: 26px;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+    .s6-screen .ph-feed {
+      margin-top: 22px;
+      border-top: 1px solid var(--hair);
+      padding-top: 12px;
+    }
+    .s6-screen .ph-feed .fh {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      margin-bottom: 10px;
+    }
+    .s6-screen .ph-feedrow {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 8px;
+      padding: 7px 0;
+      border-top: 1px solid #f2f1ee;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--ink-3);
+    }
+    .s6-screen .ph-feedrow b {
+      font-weight: 700;
+      color: var(--ink-4);
+    }
+    .s6-screen .ph-toast {
+      margin-top: 16px;
+      border: 1px solid var(--hair);
+      background: #f7f7f5;
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--ink-2);
+    }
+    .s6-screen .ph-flow {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: var(--ink-3);
+    }
+    .s6-screen .ph-node {
+      border: 1px solid var(--hair);
+      padding: 9px 8px;
+      flex: 1;
+      text-align: center;
+      color: var(--ink-2);
+    }
+    .s6-screen .ph-arrow {
+      color: var(--ink-4);
+    }
+    .s6-phone-note {
+      position: absolute;
+      left: 1140px;
+      top: 972px;
+      font-family: var(--mono);
+      font-size: 17px;
+      letter-spacing: 0.08em;
+      color: var(--ink-3);
+    }
+
+    /* ── beat B: revisions ─────────────────────────────────────── */
+    .s6-doc {
+      position: absolute;
+      left: 960px;
+      top: 258px;
+      width: 800px;
+      height: 468px;
+      background: var(--paper);
+      border: 1px solid var(--hair);
+      padding: 32px 36px;
+    }
+    .s6-doc .dh {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 24px;
+    }
+    .s6-doc .dh .t {
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: -0.025em;
+    }
+    .s6-doc .dh .m {
+      font-family: var(--mono);
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+    }
+    .s6-rev {
+      position: relative;
+      padding: 16px 0 16px 20px;
+      border-top: 1px solid var(--hair-soft);
+    }
+    .s6-rev .mark {
+      position: absolute;
+      left: 0;
+      top: 14px;
+      bottom: 14px;
+      width: 3px;
+      transform-origin: 50% 0%;
+    }
+    .s6-rev.r1 .mark {
+      background: var(--hair);
+    }
+    .s6-rev.r2 .mark,
+    .s6-rev.r3 .mark {
+      background: var(--ink);
+    }
+    .s6-rev .l1 {
+      font-size: 23px;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .s6-rev .l2 {
+      height: 6px;
+      background: #ecebe7;
+      width: 72%;
+    }
+    .s6-rev .l2.w {
+      width: 48%;
+    }
+    .s6-legend {
+      position: absolute;
+      left: 960px;
+      top: 754px;
+      display: flex;
+      gap: 10px;
+    }
+    .s6-lg {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--hair);
+      background: var(--paper);
+      padding: 9px 13px;
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      color: var(--ink-2);
+    }
+    .s6-lg i {
+      width: 14px;
+      height: 3px;
+      background: var(--hair);
+    }
+    .s6-lg.g i {
+      background: var(--ink);
+    }
+
+    /* ── beat C: export ────────────────────────────────────────── */
+    .s6-exp {
+      position: absolute;
+      left: 890px;
+      top: 250px;
+      width: 920px;
+      height: 500px;
+    }
+    .s6-exp-art {
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 380px;
+      height: 430px;
+      background: var(--paper);
+      border: 1px solid var(--hair);
+      padding: 22px;
+      transform-origin: 50% 50%;
+    }
+    .s6-exp-art .k {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      margin-bottom: 10px;
+    }
+    .s6-exp-art .h {
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 14px;
+      line-height: 1.15;
+    }
+    .s6-exp-art .l {
+      height: 6px;
+      background: #ecebe7;
+      margin-bottom: 8px;
+    }
+    .s6-exp-art .l.w1 {
+      width: 82%;
+    }
+    .s6-exp-art .l.w2 {
+      width: 58%;
+    }
+    .s6-exp-art .box {
+      margin-top: 22px;
+      border: 1px solid var(--hair);
+      height: 110px;
+    }
+    .s6-ghost {
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 380px;
+      height: 430px;
+      border: 1px dashed #adada6;
+    }
+    .s6-ghost-label {
+      position: absolute;
+      left: 0;
+      top: 452px;
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+    }
+    .s6-exp-file {
+      position: absolute;
+      left: 520px;
+      top: 110px;
+      width: 340px;
+      height: 212px;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      padding: 24px;
+    }
+    .s6-exp-file .fname {
+      font-family: var(--mono);
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .s6-exp-file .meta {
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      color: var(--ink-3);
+      line-height: 1.8;
+    }
+    .s6-exp-file .seal {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      width: 28px;
+      height: 28px;
+      background: var(--grad);
+    }
+    .s6-exp-arrow {
+      position: absolute;
+      left: 412px;
+      top: 240px;
+      width: 76px;
+      height: 1px;
+      background: var(--ink);
+      transform-origin: 0% 50%;
+    }
+    .s6-exp-arrow::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: -4px;
+      width: 8px;
+      height: 8px;
+      border-top: 1px solid var(--ink);
+      border-right: 1px solid var(--ink);
+      transform: rotate(45deg);
+    }
+    .s6-exp-note {
+      position: absolute;
+      left: 520px;
+      top: 354px;
+      font-family: var(--mono);
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+
+    /* ── beat D: whiteboard ────────────────────────────────────── */
+    .s6-wb {
+      position: absolute;
+      left: 960px;
+      top: 292px;
+      width: 780px;
+      height: 500px;
+    }
+    .s6-mermaid {
+      position: absolute;
+      left: 170px;
+      top: 0;
+      width: 440px;
+      border: 1px solid var(--hair);
+      background: #efefec;
+      padding: 12px 16px;
+      font-family: var(--mono);
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--ink-3);
+      white-space: pre;
+    }
+    .s6-mermaid b {
+      font-weight: 500;
+      color: var(--ink);
+    }
+    .s6-wbnodes {
+      position: absolute;
+      left: 170px;
+      top: 108px;
+      width: 440px;
+      height: 330px;
+    }
+    .s6-wn {
+      position: absolute;
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      box-shadow: 4px 4px 0 #e3e2dd;
+      transform-origin: 50% 50%;
+    }
+    .s6-wn.wn1 {
+      left: 20px;
+      top: 0;
+      width: 400px;
+    }
+    .s6-wn.wn2 {
+      left: 20px;
+      top: 116px;
+      width: 400px;
+    }
+    .s6-wn.wn3 {
+      left: 20px;
+      top: 232px;
+      width: 400px;
+    }
+    .s6-wire {
+      position: absolute;
+      width: 1px;
+      background: #a5a59d;
+      transform-origin: 50% 0%;
+    }
+    .s6-wb-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 1px solid var(--ink);
+      background: var(--paper);
+      z-index: 3;
+    }
+    .s6-wb-cur {
+      position: absolute;
+      width: 20px;
+      height: 24px;
+      z-index: 6;
+    }
+    .s6-wb-note {
+      position: absolute;
+      left: 170px;
+      top: 468px;
+      font-family: var(--mono);
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+  </style>
+
+  <div id="root" data-composition-id="s6" data-width="1920" data-height="1080">
+    <div class="grid-surface"></div>
+
+    <div class="s6-chrome">
+      <div class="eyebrow">Also</div>
+      <div class="s6-prog">
+        <span class="bar" id="s6-b1"></span>
+        <span class="bar" id="s6-b2"></span>
+        <span class="bar" id="s6-b3"></span>
+        <span class="bar" id="s6-b4"></span>
+        <span class="note" style="margin-left: 12px">capabilities</span>
+      </div>
+    </div>
+
+    <!-- 01 · phone -->
+    <div class="clip s6-beat" id="s6-beat1" data-start="0" data-duration="3.1">
+      <div class="s6-copy">
+        <div class="eyebrow">Phone</div>
+        <h3 id="s6-h1">Review from<br />your phone</h3>
+        <p id="s6-p1">The same review surface over Tailscale. Point, select, queue.</p>
+        <div class="detail" id="s6-d1"><i></i>no app · no build step</div>
+      </div>
+      <div class="s6-phone" id="s6-phone">
+        <div class="s6-notch"></div>
+        <div class="s6-screen">
+          <div class="ph-k">Plan</div>
+          <div class="ph-h">Onboarding, restructured</div>
+          <div class="ph-l"></div>
+          <div class="ph-l w1"></div>
+          <div class="ph-l w2"></div>
+          <div class="ph-sec">Comparison</div>
+          <div class="ph-panel">
+            <div class="ph-row"><span>Entry points</span><span>one</span></div>
+            <div class="ph-row"><span>First paint</span><span>immediate</span></div>
+            <div class="ph-row"><span>Rollback</span><span>flag</span></div>
+          </div>
+          <div class="ph-cards">
+            <div class="ph-card"><div class="cl"></div><div class="cl w"></div><div class="cl"></div></div>
+            <div class="ph-card sel" id="s6-phsel">
+              <div class="cl"></div><div class="cl w"></div><div class="cl"></div>
+              <span class="ph-badge" id="s6-phbadge">1</span>
+            </div>
+          </div>
+          <div class="ph-toast">layout · .summary-row overflows by 12px</div>
+          <div class="ph-flow">
+            <div class="ph-node">picker</div>
+            <span class="ph-arrow">→</span>
+            <div class="ph-node">shell</div>
+            <span class="ph-arrow">→</span>
+            <div class="ph-node">workspace</div>
+          </div>
+          <div class="ph-feed">
+            <div class="fh"><span>feedback</span><span>2 prompts</span></div>
+            <div class="ph-feedrow"><b>1</b><span>element · #comparison</span></div>
+            <div class="ph-feedrow"><b>2</b><span>layout · .summary-row</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="s6-phone-note" id="s6-pnote">tailscale · same review surface</div>
+      <div class="s6-count">01 / 04</div>
+    </div>
+
+    <!-- 02 · revisions -->
+    <div class="clip s6-beat" id="s6-beat2" data-start="3.1" data-duration="3.1">
+      <div class="s6-copy">
+        <div class="eyebrow">Revisions</div>
+        <h3 id="s6-h2">See what<br />changed</h3>
+        <p id="s6-p2">Every round marks the blocks it touched. Readable at r10.</p>
+        <div class="detail" id="s6-d2"><i></i>legend · r1 → r3</div>
+      </div>
+      <div class="s6-doc" id="s6-doc">
+        <div class="dh"><div class="t">Onboarding, restructured</div><div class="m">3 rounds</div></div>
+        <div class="s6-rev r1" id="s6-rev1"><span class="mark"></span><div class="l1">Entry points: three → one</div><div class="l2"></div></div>
+        <div class="s6-rev r2" id="s6-rev2"><span class="mark"></span><div class="l1">Panels get 24px more room</div><div class="l2 w"></div></div>
+        <div class="s6-rev r3" id="s6-rev3"><span class="mark"></span><div class="l1">“shell paints first, the payload follows”</div><div class="l2"></div></div>
+        <div class="s6-rev" id="s6-rev4"><span class="mark" style="background: #ecebe7"></span><div class="l1">Rollback stays behind a flag</div><div class="l2 w"></div></div>
+      </div>
+      <div class="s6-legend" id="s6-legend">
+        <div class="s6-lg"><i></i>r1</div>
+        <div class="s6-lg g"><i></i>r2</div>
+        <div class="s6-lg g"><i></i>r3</div>
+      </div>
+      <div class="s6-count">02 / 04</div>
+    </div>
+
+    <!-- 03 · export -->
+    <div class="clip s6-beat" id="s6-beat3" data-start="6.2" data-duration="3.1">
+      <div class="s6-copy">
+        <div class="eyebrow">Export</div>
+        <h3 id="s6-h3">One file<br />out</h3>
+        <p id="s6-p3">One portable HTML file — annotations resolved, images embedded.</p>
+        <div class="detail" id="s6-d3"><i></i>no server required</div>
+      </div>
+      <div class="s6-exp">
+        <div class="s6-exp-art" id="s6-expart">
+          <div class="k">Plan</div>
+          <div class="h">Onboarding, restructured</div>
+          <div class="l"></div>
+          <div class="l w1"></div>
+          <div class="l w2"></div>
+          <div class="box"></div>
+        </div>
+        <div class="s6-ghost" id="s6-ghost"></div>
+        <div class="s6-ghost-label" id="s6-ghostlabel">artifact · plan.html</div>
+        <div class="s6-exp-arrow" id="s6-exparrow"></div>
+        <div class="s6-exp-file" id="s6-expfile">
+          <div class="seal" id="s6-seal"></div>
+          <div class="fname">plan.html</div>
+          <div class="meta">one file<br />review resolved<br />self-contained</div>
+        </div>
+        <div class="s6-exp-note" id="s6-expnote">portable · one artifact</div>
+      </div>
+      <div class="s6-count">03 / 04</div>
+    </div>
+
+    <!-- 04 · whiteboard -->
+    <div class="clip s6-beat" id="s6-beat4" data-start="9.3" data-duration="3.2">
+      <div class="s6-copy">
+        <div class="eyebrow">Whiteboard</div>
+        <h3 id="s6-h4">Diagrams you<br />can move</h3>
+        <p id="s6-p4">A Mermaid block opens as a whiteboard. The source stays authoritative.</p>
+        <div class="detail" id="s6-d4"><i></i>mermaid → whiteboard</div>
+      </div>
+      <div class="s6-wb">
+        <div class="s6-mermaid" id="s6-mermaid">flowchart LR
+  <b>picker</b> --> <b>shell</b> --> <b>workspace</b></div>
+        <div class="s6-wbnodes">
+          <div class="s6-wire" id="s6-wire1" style="left: 219px; top: 74px; height: 42px"></div>
+          <div class="s6-wire" id="s6-wire2" style="left: 219px; top: 190px; height: 42px; transform-origin: 50% 100%"></div>
+          <div class="s6-wn wn1" id="s6-wn1">intent picker</div>
+          <div class="s6-wn wn2" id="s6-wn2">shell</div>
+          <div class="s6-wn wn3" id="s6-wn3">workspace</div>
+          <span class="s6-wb-handle" id="s6-h-a" style="left: 414px; top: 120px"></span>
+          <span class="s6-wb-handle" id="s6-h-b" style="left: 414px; top: 174px"></span>
+          <span class="s6-wb-handle" id="s6-h-c" style="left: 28px; top: 174px"></span>
+        </div>
+        <div class="s6-wb-note" id="s6-wbnote">drag · source stays authoritative</div>
+        <svg class="s6-wb-cur" id="s6-wbcur" viewBox="0 0 20 24" style="left: 0; top: 0">
+          <path d="M1 1 L1 19 L5.8 14.5 L9 22 L12 20.6 L8.9 13.2 L15.4 13 Z" fill="#171717" />
+        </svg>
+      </div>
+      <div class="s6-count">04 / 04</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo(".s6-chrome .eyebrow", { opacity: 1, x: -14 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, 0);
+      tl.fromTo(".s6-prog", { opacity: 1 }, { opacity: 1, duration: 0.4 }, 0.1);
+
+      /* 01 — phone */
+      tl.fromTo("#s6-beat1 .s6-copy > *", { opacity: 1, y: 22 }, { opacity: 1, y: 0, duration: 0.42, stagger: 0.08, ease: "power2.out" }, 0.05);
+      tl.fromTo("#s6-phone", { opacity: 1, y: 80 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.15);
+      tl.fromTo("#s6-phsel", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.0);
+      tl.fromTo("#s6-phbadge", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 1.15);
+      tl.fromTo("#s6-pnote", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 1.25);
+      tl.set("#s6-b1", { backgroundColor: "#171717" }, 0.05);
+
+      /* 02 — revisions */
+      tl.fromTo("#s6-beat2 .s6-copy > *", { opacity: 1, y: 22 }, { opacity: 1, y: 0, duration: 0.42, stagger: 0.08, ease: "power2.out" }, 3.15);
+      tl.fromTo("#s6-doc", { opacity: 1, y: 34 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 3.2);
+      tl.fromTo("#s6-rev1, #s6-rev2, #s6-rev3, #s6-rev4", { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: 0.35, stagger: 0.1, ease: "power2.out" }, 3.55);
+      tl.fromTo('#s6-rev1 .mark, #s6-rev2 .mark, #s6-rev3 .mark, #s6-rev4 .mark', { scaleY: 0 }, { scaleY: 1, duration: 0.35, stagger: 0.1, ease: "power2.out" }, 3.6);
+      tl.fromTo("#s6-legend .s6-lg", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.1, ease: "power2.out" }, 4.4);
+      tl.set("#s6-b2", { backgroundColor: "#171717" }, 3.15);
+
+      /* 03 — export */
+      tl.fromTo("#s6-beat3 .s6-copy > *", { opacity: 1, y: 22 }, { opacity: 1, y: 0, duration: 0.42, stagger: 0.08, ease: "power2.out" }, 6.25);
+      tl.fromTo("#s6-expart", { opacity: 1, x: -26 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 6.3);
+      tl.fromTo("#s6-exparrow", { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, 6.9);
+      // the artifact folds into a single file, leaving its outline where it stood
+      tl.fromTo("#s6-ghost", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 7.15);
+      tl.fromTo("#s6-ghostlabel", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 7.3);
+      tl.to("#s6-expart", { scale: 0.62, x: 520, y: 100, opacity: 0, duration: 0.75, ease: "power3.inOut" }, 7.15);
+      tl.fromTo("#s6-expfile", { opacity: 0, scale: 0.86, y: 18 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "power3.out" }, 7.45);
+      tl.fromTo("#s6-seal", { scale: 0, rotate: -25 }, { scale: 1, rotate: 0, duration: 0.4, ease: "back.out(2.4)" }, 7.8);
+      tl.fromTo("#s6-expnote", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 8.0);
+      tl.set("#s6-b3", { backgroundColor: "#171717" }, 6.25);
+
+      /* 04 — whiteboard */
+      tl.fromTo("#s6-beat4 .s6-copy > *", { opacity: 1, y: 22 }, { opacity: 1, y: 0, duration: 0.42, stagger: 0.08, ease: "power2.out" }, 9.35);
+      tl.fromTo("#s6-mermaid", { opacity: 1, y: -14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 9.4);
+      tl.fromTo("#s6-wn1", { opacity: 0, y: 26, rotation: -0.6 }, { opacity: 1, y: 0, rotation: -0.6, duration: 0.42, ease: "power3.out" }, 9.42);
+      tl.fromTo("#s6-wn2", { opacity: 0, y: 26, rotation: 0.5 }, { opacity: 1, y: 0, rotation: 0.5, duration: 0.42, ease: "power3.out" }, 9.52);
+      tl.fromTo("#s6-wn3", { opacity: 0, y: 26, rotation: -0.4 }, { opacity: 1, y: 0, rotation: -0.4, duration: 0.42, ease: "power3.out" }, 9.62);
+      tl.fromTo("#s6-wire1, #s6-wire2", { scaleY: 0 }, { scaleY: 1, duration: 0.3, stagger: 0.1, ease: "power2.out" }, 9.78);
+      tl.fromTo("#s6-h-a, #s6-h-b, #s6-h-c", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.25, stagger: 0.09, ease: "back.out(2)" }, 10.05);
+      // one node is dragged, the wires follow, the source line stays put
+      tl.fromTo("#s6-wbcur", { opacity: 0, x: 600, y: 402 }, { opacity: 1, duration: 0.25 }, 10.25);
+      tl.to("#s6-wbcur", { x: 390, y: 236, duration: 0.45, ease: "power2.inOut" }, 10.3);
+      tl.to("#s6-wn2", { y: 28, duration: 0.55, ease: "power2.inOut" }, 10.85);
+      tl.to("#s6-h-b, #s6-h-c", { y: 28, duration: 0.55, ease: "power2.inOut" }, 10.85);
+      tl.to("#s6-wire1", { scaleY: 1.667, duration: 0.55, ease: "power2.inOut" }, 10.85);
+      tl.to("#s6-wire2", { scaleY: 0.333, duration: 0.55, ease: "power2.inOut" }, 10.85);
+      tl.to("#s6-wbcur", { y: 264, duration: 0.45, ease: "power2.inOut" }, 11.4);
+      tl.fromTo("#s6-wbnote", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 11.6);
+      tl.set("#s6-b4", { backgroundColor: "#171717" }, 9.35);
+
+      window.__timelines["s6"] = tl;
+    })();
+  </script>
+</template>

@@ -1,6 +1,15 @@
 # Third-party notices
 
-The published `lavish-axi` package vendors the following third-party software into `dist/`.
+## Lavish Editor (upstream)
+
+ACRYL AXI is extended from Lavish Editor / [`lavish-axi`](https://github.com/kunchenguid/lavish-axi) by Kun Chen, MIT, Copyright (c) 2026 Kun Chen.
+The upstream project supplies the design and a substantial portion of the source this fork starts from, including its generated skill and browser UI.
+That upstream work remains under the MIT license, and its copyright notice is preserved in [LICENSE](LICENSE).
+Everything under `upstream/` is unmodified upstream reference material; see [docs/upstream-reference.md](docs/upstream-reference.md).
+
+## Bundled packages
+
+The published `acrylaxi` package vendors the following third-party software into `dist/`.
 Each component remains under its own license; the notices below satisfy their attribution requirements.
 The whiteboard bundle (`dist/whiteboard/`) is built from these packages by `scripts/build.js`.
 

@@ -1,0 +1,890 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--ink-canvas);
+      font-family: var(--sans);
+      color: var(--ink-fg);
+    }
+    .s4-left {
+      position: absolute;
+      inset: 0;
+    }
+    #root *,
+    #root *::before,
+    #root *::after {
+      box-sizing: border-box;
+    }
+
+    .s4-chrome {
+      position: absolute;
+      top: 92px;
+      left: 100px;
+      right: 100px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .s4-chrome .eyebrow {
+      color: var(--ink-fg-3);
+    }
+    .s4-chrome .right {
+      font-family: var(--mono);
+      font-size: 17px;
+      letter-spacing: 0.14em;
+      color: var(--ink-fg-3);
+      text-transform: uppercase;
+    }
+
+    /* ── agent side: poll output ────────────────────────────────── */
+    .s4-term {
+      position: absolute;
+      left: 100px;
+      top: 168px;
+      width: 760px;
+      height: 232px;
+      background: #1a1a19;
+      border: 1px solid var(--ink-hair);
+      padding: 16px 20px;
+    }
+    .s4-thead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--ink-hair);
+      margin-bottom: 14px;
+    }
+    .s4-thead .l {
+      font-family: var(--mono);
+      font-size: 14px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-fg-3);
+    }
+    .s4-thead .r {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: var(--ink-fg-3);
+    }
+    .s4-ln {
+      font-family: var(--mono);
+      font-size: 20px;
+      line-height: 1.62;
+      color: var(--ink-fg-2);
+      white-space: nowrap;
+    }
+    .s4-ln.cmd {
+      color: var(--ink-fg);
+    }
+    .s4-ln .p {
+      color: var(--ink-fg-3);
+      margin-right: 10px;
+    }
+    .s4-ln.dim {
+      color: var(--ink-fg-3);
+    }
+    .s4-ln .ok {
+      color: var(--ink-fg);
+      font-weight: 500;
+    }
+    .s4-ln .cursorblock {
+      display: inline-block;
+      width: 10px;
+      height: 18px;
+      background: var(--ink-fg);
+      transform: translateY(3px);
+    }
+
+    /* ── agent side: the edit ───────────────────────────────────── */
+    .s4-diff {
+      position: absolute;
+      left: 100px;
+      top: 432px;
+      width: 760px;
+      height: 468px;
+      background: #1a1a19;
+      border: 1px solid var(--ink-hair);
+      padding: 0;
+      overflow: hidden;
+    }
+    .s4-dhead {
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--ink-hair);
+      background: #211f1e;
+    }
+    .s4-dhead .f {
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      color: var(--ink-fg-2);
+    }
+    .s4-dhead .m {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-fg-3);
+    }
+    .s4-dbody {
+      padding: 14px 0 0 0;
+    }
+    .s4-dl {
+      position: relative;
+      font-family: var(--mono);
+      font-size: 18px;
+      line-height: 1.85;
+      color: #9c9c94;
+      white-space: pre;
+      padding: 0 18px;
+      letter-spacing: 0;
+    }
+    .s4-dl.add {
+      color: #f2f2ef;
+      background: rgba(242, 242, 239, 0.045);
+    }
+    .s4-dl.del {
+      color: #8d8d86;
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+    }
+    .s4-dl.hunk {
+      color: #8d8d86;
+    }
+    .s4-marker {
+      position: absolute;
+      left: 0;
+      top: 3px;
+      bottom: 3px;
+      width: 2px;
+      background: var(--grad);
+      opacity: 0;
+    }
+
+    /* ── the reloaded artifact ──────────────────────────────────── */
+    .s4-win {
+      position: absolute;
+      left: 920px;
+      top: 168px;
+      width: 900px;
+      height: 732px;
+      background: var(--ink-panel);
+      border: 1px solid var(--ink-hair);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 40px 90px -50px rgba(0, 0, 0, 0.9);
+    }
+    .s4-toolbar {
+      height: 50px;
+      flex: 0 0 50px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--ink-hair);
+      background: #212120;
+    }
+    .s4-sq {
+      width: 6px;
+      height: 6px;
+      background: #454541;
+    }
+    .s4-addr {
+      margin-left: 10px;
+      font-family: var(--mono);
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      color: var(--ink-fg-2);
+      border: 1px solid #333330;
+      background: #1a1a19;
+      padding: 5px 10px;
+    }
+    .s4-addr b {
+      font-weight: 500;
+      color: var(--ink-fg);
+    }
+    .s4-rev {
+      margin-left: auto;
+      display: flex;
+      gap: 6px;
+    }
+    .s4-chip {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-fg-3);
+      border: 1px solid #3a3a36;
+      padding: 3px 8px;
+    }
+    .s4-chip.on {
+      color: #171717;
+      background: #f2f2ef;
+      border-color: #f2f2ef;
+    }
+    .s4-flash {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 2px;
+      background: var(--grad);
+      transform-origin: 0% 50%;
+      opacity: 0;
+    }
+    .s4-body {
+      position: relative;
+      flex: 1;
+      padding: 22px 26px 0 26px;
+    }
+    .s4-kicker {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-fg-3);
+    }
+    .s4-h3 {
+      margin: 8px 0 8px 0;
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: -0.028em;
+      color: var(--ink-fg);
+      line-height: 1.1;
+    }
+    .s4-lede {
+      position: relative;
+      margin: 0 0 22px 0;
+      font-size: 21px;
+      line-height: 1.4;
+      color: var(--ink-fg-2);
+      height: 30px;
+    }
+    .s4-lede span {
+      position: absolute;
+      left: 0;
+      top: 0;
+      white-space: nowrap;
+    }
+    #s4-lede2 {
+      opacity: 0;
+    }
+    .s4-b2head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .s4-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+    .s4-panel {
+      position: relative;
+      border: 1px solid var(--ink-hair);
+      background: #1a1a19;
+      padding: 12px 14px;
+      transform-origin: 50% 0%;
+    }
+    .s4-pre {
+      transform-origin: 50% 0%;
+    }
+    .s4-panel .ph {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-fg-3);
+      margin-bottom: 8px;
+    }
+    .s4-panel .pr {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      color: var(--ink-fg-2);
+      padding: 5px 0;
+      border-top: 1px solid #262624;
+    }
+    .s4-panel .pr span:last-child {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--ink-fg-3);
+    }
+    .s4-panel .pr.hi span:last-child {
+      color: var(--ink-fg);
+    }
+    .s4-rblock {
+      position: relative;
+      margin-top: 26px;
+      border: 1px solid var(--ink-hair);
+      background: #1a1a19;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .s4-rblock .rt {
+      font-size: 19px;
+      color: var(--ink-fg-2);
+    }
+    .s4-rblock .rm {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-fg-3);
+    }
+    .s4-rblock .rflag {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: #171717;
+      background: #f2f2ef;
+      padding: 3px 8px;
+      opacity: 0;
+    }
+    .s4-nodes {
+      position: relative;
+      height: 74px;
+      margin-top: 10px;
+    }
+    .s4-node {
+      position: absolute;
+      top: 0;
+      height: 74px;
+      width: 220px;
+      border: 1px solid var(--ink-hair);
+      background: #1a1a19;
+      padding: 9px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .s4-node .nt {
+      font-size: 17px;
+      color: var(--ink-fg);
+    }
+    .s4-node .nm {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-fg-3);
+    }
+    .s4-node.n1 {
+      left: 0;
+    }
+    .s4-node.n2 {
+      left: 250px;
+    }
+    .s4-node.n3 {
+      left: 500px;
+    }
+    .s4-conn {
+      position: absolute;
+      top: 37px;
+      height: 1px;
+      background: #454541;
+    }
+    .s4-conn.c1 {
+      left: 220px;
+      width: 30px;
+      transform-origin: 0% 50%;
+    }
+    .s4-conn.c2 {
+      left: 470px;
+      width: 30px;
+      transform-origin: 100% 50%;
+    }
+    .s4-ctx {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 26px;
+      border-top: 1px solid var(--ink-hair);
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-fg-3);
+    }
+    .s4-ctx .side {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .s4-ctx .dot {
+      width: 7px;
+      height: 7px;
+      background: #f2f2ef;
+    }
+    .s4-ctxswap {
+      position: relative;
+      display: inline-block;
+      width: 196px;
+      height: 15px;
+      text-align: right;
+    }
+    .s4-ctxswap span {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    #s4-ctxb {
+      opacity: 0;
+    }
+    #s4-rblock {
+      opacity: 0;
+    }
+
+    /* ── revisions legend ───────────────────────────────────────── */
+    .s4-legend {
+      position: absolute;
+      left: 920px;
+      top: 922px;
+      width: 900px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .s4-legend .lbl {
+      font-family: var(--mono);
+      font-size: 14px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-fg-3);
+      margin-right: 4px;
+    }
+    .s4-lg {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--mono);
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      color: var(--ink-fg-2);
+      border: 1px solid #3a3a36;
+      padding: 5px 10px;
+    }
+    .s4-lg i {
+      display: block;
+      width: 14px;
+      height: 3px;
+      background: var(--ink-fg-3);
+    }
+    .s4-lg.new i {
+      background: var(--grad);
+    }
+
+    /* ── full-frame loop strip ──────────────────────────────────── */
+    .s4-loopstage {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+    }
+    .s4-loopbg {
+      position: absolute;
+      inset: 0;
+      background: var(--ink-canvas);
+      transform-origin: 50% 100%;
+    }
+    .s4-loopgrid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, var(--ink-hair-soft) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--ink-hair-soft) 1px, transparent 1px);
+      background-size: 96px 96px;
+    }
+    .s4-loophead {
+      position: absolute;
+      top: 92px;
+      left: 100px;
+      right: 100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .s4-loophead .eyebrow {
+      color: var(--ink-fg-3);
+    }
+    .s4-loophead .right {
+      font-family: var(--mono);
+      font-size: 17px;
+      letter-spacing: 0.14em;
+      color: var(--ink-fg-3);
+      text-transform: uppercase;
+    }
+    .s4-looptitle {
+      position: absolute;
+      left: 100px;
+      top: 186px;
+      font-size: 66px;
+      font-weight: 500;
+      letter-spacing: -0.042em;
+      line-height: 1.06;
+      color: var(--ink-fg);
+      white-space: nowrap;
+    }
+    .s4-steps {
+      position: absolute;
+      left: 100px;
+      top: 430px;
+      width: 1720px;
+      height: 240px;
+    }
+    .s4-step {
+      position: absolute;
+      top: 0;
+      width: 300px;
+      border-top: 1px solid var(--ink-hair);
+      padding-top: 18px;
+    }
+    .s4-step .num {
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.14em;
+      color: var(--ink-fg-3);
+      margin-bottom: 16px;
+    }
+    .s4-step .lab {
+      font-size: 38px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      color: var(--ink-fg);
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .s4-step .sub {
+      font-family: var(--mono);
+      font-size: 17px;
+      line-height: 1.5;
+      color: var(--ink-fg-3);
+      white-space: nowrap;
+    }
+    .s4-sarrow {
+      position: absolute;
+      top: 68px;
+      width: 32px;
+      height: 1px;
+      background: #454541;
+    }
+    .s4-loopline {
+      position: absolute;
+      left: 100px;
+      top: 300px;
+      width: 1720px;
+    }
+    .s4-arc {
+      position: absolute;
+      left: 0;
+      top: 720px;
+      width: 1720px;
+      height: 150px;
+    }
+    .s4-loopnote {
+      position: absolute;
+      left: 100px;
+      right: 100px;
+      top: 916px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 16px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-fg-3);
+    }
+    .s4-dot {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 9px;
+      height: 9px;
+      background: #f2f2ef;
+      margin: -4px 0 0 -4px;
+      border-radius: 50%;
+    }
+  </style>
+
+  <div id="root" data-composition-id="s4" data-width="1920" data-height="1080">
+    <div class="grid-surface inverse"></div>
+
+    <div class="s4-chrome">
+      <div class="eyebrow">The loop / two</div>
+      <div class="right">agent side</div>
+    </div>
+
+    <div class="clip s4-left" id="s4-left" data-start="0" data-duration="6.9">
+    <!-- poll output -->
+    <div class="s4-term" id="s4-term">
+      <div class="s4-thead">
+        <div class="l">agent · long-poll</div>
+        <div class="r">local · no cloud</div>
+      </div>
+      <div class="s4-ln cmd"><span class="p">$</span>acrylaxi poll plan.html</div>
+      <div class="s4-ln dim" id="s4-o1">waiting for feedback…</div>
+      <div class="s4-ln" id="s4-o2"><span class="ok">4 prompts</span> · 1 conversation</div>
+      <div class="s4-ln dim" id="s4-o3">editing plan.html<span class="cursorblock" id="s4-cb"></span></div>
+    </div>
+
+    <!-- the edit -->
+    <div class="s4-diff" id="s4-diff">
+      <div class="s4-dhead">
+        <div class="f">plan.html</div>
+        <div class="m">diff · this round</div>
+      </div>
+      <div class="s4-dbody">
+        <div class="s4-dl hunk" id="s4-d0">@@ -18,7 +18,9 @@</div>
+        <div class="s4-dl del" id="s4-d1">-  &lt;div class="comparison"&gt;</div>
+        <div class="s4-dl add" id="s4-d2">+  &lt;div class="comparison tall"&gt;<span class="s4-marker" id="s4-m1"></span></div>
+        <div class="s4-dl del" id="s4-d3">-  &lt;p&gt;shell paints before the payload&lt;/p&gt;</div>
+        <div class="s4-dl add" id="s4-d4">+  &lt;p&gt;the shell paints first, the payload follows&lt;/p&gt;<span class="s4-marker" id="s4-m2"></span></div>
+        <div class="s4-dl add" id="s4-d5">+  &lt;span class="rev"&gt;r2&lt;/span&gt;<span class="s4-marker" id="s4-m3"></span></div>
+        <div class="s4-dl" id="s4-d6">+    &lt;p class="note"&gt;labels get 24px&lt;/p&gt;</div>
+        <div class="s4-dl" id="s4-d7">   &lt;/div&gt;</div>
+        <div class="s4-dl" id="s4-d8">   &lt;section class="flow"&gt;</div>
+      </div>
+    </div>
+    </div>
+
+    <!-- the artifact after regeneration -->
+    <div class="clip s4-win" id="s4-win" data-start="1.1" data-duration="5.8">
+      <div class="s4-toolbar">
+        <span class="s4-sq"></span><span class="s4-sq"></span><span class="s4-sq"></span>
+        <div class="s4-addr"><b>acrylaxi</b> · plan.html</div>
+        <div class="s4-rev">
+          <span class="s4-chip" id="s4-r1">r1</span>
+          <span class="s4-chip" id="s4-r2">r2</span>
+        </div>
+      </div>
+      <div class="s4-flash" id="s4-flash"></div>
+      <div class="s4-body">
+        <div class="s4-kicker">Plan</div>
+        <h3 class="s4-h3">Onboarding, restructured</h3>
+        <p class="s4-lede">
+          <span id="s4-lede1">Three phases. The shell paints before the payload lands.</span>
+          <span id="s4-lede2">Three phases. The shell paints first, the payload follows.</span>
+        </p>
+
+        <div class="s4-b2head">
+          <div class="s4-kicker">Comparison</div>
+          <div class="s4-kicker">2 panels</div>
+        </div>
+        <div class="s4-panels">
+          <div class="s4-panel" id="s4-pa">
+            <div class="s4-pre">
+              <div class="ph"><span>Now</span><span>today</span></div>
+              <div class="pr"><span>Entry points</span><span>three</span></div>
+              <div class="pr"><span>First paint</span><span>blocked</span></div>
+              <div class="pr"><span>Rollback</span><span>revert</span></div>
+              <div class="pr"><span>Labels</span><span>crowded</span></div>
+            </div>
+          </div>
+          <div class="s4-panel" id="s4-pb">
+            <div class="s4-pre">
+              <div class="ph"><span>Proposed</span><span>this round</span></div>
+              <div class="pr hi"><span>Entry points</span><span>one</span></div>
+              <div class="pr hi"><span>First paint</span><span>immediate</span></div>
+              <div class="pr hi"><span>Rollback</span><span>flag</span></div>
+              <div class="pr hi"><span>Labels</span><span>room to breathe</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s4-rblock" id="s4-rblock">
+          <div>
+            <div class="rt">Layout · .summary-row</div>
+            <div class="rm">fix applied</div>
+          </div>
+          <div class="rflag" id="s4-rflag">r2</div>
+        </div>
+
+        <div class="s4-nodes">
+          <div class="s4-node n1"><div class="nt">intent picker</div><div class="nm">route</div></div>
+          <div class="s4-conn c1" id="s4-c1"></div>
+          <div class="s4-node n2" id="s4-n2"><div class="nt">shell</div><div class="nm">paints first</div></div>
+          <div class="s4-conn c2" id="s4-c2"></div>
+          <div class="s4-node n3"><div class="nt">workspace</div><div class="nm">suspense</div></div>
+        </div>
+
+        <div class="s4-ctx" id="s4-ctx">
+          <span class="side">state · ~/.acrylaxi/</span>
+          <span class="side"
+            ><span class="dot"></span
+            ><span class="s4-ctxswap"><span id="s4-ctxa">live reload</span><span id="s4-ctxb">review context kept</span></span></span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- revisions legend -->
+    <div class="clip s4-legend" id="s4-legend" data-start="5.6" data-duration="1.3">
+      <div class="lbl">Revisions</div>
+      <div class="s4-lg" id="s4-lg1"><i></i>r1 · first plan</div>
+      <div class="s4-lg new" id="s4-lg2"><i></i>r2 · this round</div>
+      <div class="s4-lg" id="s4-lg3"><i></i>r3 · marked blocks</div>
+    </div>
+
+    <!-- full-frame: the loop, named -->
+    <div class="clip s4-loopstage" id="s4-loopstage" data-start="6.9" data-duration="3.1" data-layout-allow-occlusion>
+      <div class="s4-loopbg" id="s4-loopbg" data-layout-allow-occlusion></div>
+      <div class="s4-loopgrid" id="s4-loopgrid" data-layout-allow-occlusion></div>
+      <div class="s4-loophead">
+        <div class="eyebrow" id="s4-loopeyebrow">The loop</div>
+        <div class="right" id="s4-loopright">repeat</div>
+      </div>
+      <div class="s4-looptitle" id="s4-looptitle">The loop closes on the file.</div>
+      <div class="s4-steps" id="s4-steps">
+        <div class="s4-step" id="s4-st1" style="left: 0">
+          <div class="num">01</div>
+          <div class="lab">agent writes</div>
+          <div class="sub">plan.html</div>
+        </div>
+        <div class="s4-step" id="s4-st2" style="left: 355px">
+          <div class="num">02</div>
+          <div class="lab">you open it</div>
+          <div class="sub">acrylaxi plan.html</div>
+        </div>
+        <div class="s4-step" id="s4-st3" style="left: 710px">
+          <div class="num">03</div>
+          <div class="lab">you answer</div>
+          <div class="sub">point · select · queue</div>
+        </div>
+        <div class="s4-step" id="s4-st4" style="left: 1065px">
+          <div class="num">04</div>
+          <div class="lab">agent polls</div>
+          <div class="sub">acrylaxi poll plan.html</div>
+        </div>
+        <div class="s4-step" id="s4-st5" style="left: 1420px">
+          <div class="num">05</div>
+          <div class="lab">file updates</div>
+          <div class="sub">reload · context kept</div>
+        </div>
+        <div class="s4-sarrow" id="s4-ar1" style="left: 300px"></div>
+        <div class="s4-sarrow" id="s4-ar2" style="left: 655px"></div>
+        <div class="s4-sarrow" id="s4-ar3" style="left: 1010px"></div>
+        <div class="s4-sarrow" id="s4-ar4" style="left: 1365px"></div>
+      </div>
+      <svg class="s4-arc" viewBox="0 0 1720 150" fill="none" aria-hidden="true">
+        <path
+          id="s4-arcpath"
+          d="M1570 6 C1570 96 250 96 250 6"
+          stroke="#4f4f49"
+          stroke-width="1.5"
+          stroke-dasharray="7 8"
+        />
+        <path id="s4-arcarrow" d="M250 26 L250 2 L268 12" stroke="#4f4f49" stroke-width="1.5" fill="none" />
+      </svg>
+      <div class="s4-dot" id="s4-trip"></div>
+      <div class="s4-loopnote" id="s4-loopnote">one artifact · one conversation · every round</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo(".s4-chrome .eyebrow", { opacity: 1, x: -14 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0);
+      tl.fromTo(".s4-chrome .right", { opacity: 1 }, { opacity: 1, duration: 0.5 }, 0.16);
+
+      tl.fromTo("#s4-term", { opacity: 1, y: 18 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 0);
+      tl.fromTo("#s4-o1", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 0.5);
+      tl.fromTo("#s4-o2", { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 1.25);
+      tl.fromTo("#s4-o3", { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 1.9);
+      tl.fromTo("#s4-cb", { opacity: 1 }, { opacity: 0, duration: 0.22, repeat: 5, yoyo: true, ease: "none" }, 2.0);
+
+      tl.fromTo("#s4-diff", { opacity: 1, y: 20 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 1.1);
+      tl.fromTo("#s4-d0", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.6);
+      tl.fromTo("#s4-d1", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.32, ease: "power2.out" }, 1.75);
+      tl.fromTo("#s4-d2", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.32, ease: "power2.out" }, 2.0);
+      tl.fromTo("#s4-m1", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 2.05);
+      tl.fromTo("#s4-d3", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.32, ease: "power2.out" }, 2.25);
+      tl.fromTo("#s4-d4", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.32, ease: "power2.out" }, 2.5);
+      tl.fromTo("#s4-m2", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 2.55);
+      tl.fromTo("#s4-d5", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.32, ease: "power2.out" }, 2.75);
+      tl.fromTo("#s4-m3", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 2.8);
+      tl.fromTo("#s4-d6", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, 3.0);
+      tl.fromTo("#s4-d7", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 3.15);
+      tl.fromTo("#s4-d8", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 3.28);
+
+      tl.fromTo("#s4-win", { opacity: 1, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 1.1);
+
+      // reload: r1 -> r2, the file lands and the page refreshes in place
+      tl.fromTo("#s4-flash", { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.5, ease: "power2.inOut" }, 3.55);
+      tl.to("#s4-flash", { opacity: 0, duration: 0.3 }, 4.15);
+      tl.to("#s4-r1", { color: "#8d8d86", borderColor: "#3a3a36", backgroundColor: "rgba(0,0,0,0)", duration: 0.25 }, 3.7);
+      tl.to("#s4-r2", { color: "#171717", backgroundColor: "#f2f2ef", borderColor: "#f2f2ef", duration: 0.25 }, 3.7);
+
+      // the diff arrives in the page
+      tl.to("#s4-lede1", { opacity: 0, duration: 0.2 }, 3.95);
+      tl.to("#s4-lede2", { opacity: 1, duration: 0.25 }, 4.05);
+      // panels get their 24px of room, content counter-scaled so type stays crisp
+      tl.to(["#s4-pa", "#s4-pb"], { scaleY: 1.16, duration: 0.55, ease: "power2.inOut" }, 4.2);
+      tl.to(["#s4-pa .s4-pre", "#s4-pb .s4-pre"], { scaleY: 1 / 1.16, y: 4, duration: 0.55, ease: "power2.inOut" }, 4.2);
+      tl.fromTo("#s4-rblock", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 4.35);
+      tl.fromTo("#s4-rflag", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 4.7);
+      // the whiteboard move lands
+      tl.to("#s4-n2", { x: 26, duration: 0.5, ease: "power2.inOut" }, 4.95);
+      tl.to("#s4-c1", { scaleX: 1.867, duration: 0.5, ease: "power2.inOut" }, 4.95);
+      tl.to("#s4-c2", { scaleX: 0.133, duration: 0.5, ease: "power2.inOut" }, 4.95);
+
+      tl.to("#s4-ctxa", { opacity: 0, duration: 0.22 }, 5.58);
+      tl.to("#s4-ctxb", { opacity: 1, duration: 0.22 }, 5.62);
+      tl.fromTo("#s4-legend", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 5.6);
+      tl.fromTo("#s4-lg2", { backgroundColor: "rgba(0,0,0,0)" }, { backgroundColor: "rgba(242,242,239,0.07)", duration: 0.3 }, 6.05);
+
+      // the loop, named — the frame fills with it
+      tl.set("#s4-loopgrid", { opacity: 1 }, 6.9);
+      tl.set(".s4-chrome", { opacity: 0 }, 6.89);
+      tl.fromTo("#s4-loopeyebrow", { opacity: 1, y: 10 }, { opacity: 1, y: 0, duration: 0.4 }, 6.9);
+      tl.fromTo("#s4-loopright", { opacity: 1 }, { opacity: 1, duration: 0.4 }, 6.9);
+      tl.fromTo("#s4-looptitle", { opacity: 1, y: 26 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 6.9);
+      tl.fromTo(
+        ["#s4-st1", "#s4-st2", "#s4-st3", "#s4-st4", "#s4-st5"],
+        { opacity: 0, y: 22 },
+        { opacity: 1, y: 0, duration: 0.45, stagger: 0.13, ease: "power2.out" },
+        7.15,
+      );
+      tl.fromTo(
+        ["#s4-ar1", "#s4-ar2", "#s4-ar3", "#s4-ar4"],
+        { scaleX: 0, opacity: 0 },
+        { scaleX: 1, opacity: 1, duration: 0.3, stagger: 0.13, ease: "power2.out" },
+        7.4,
+      );
+      const arc = document.querySelector("#s4-arcpath");
+      const alen = arc.getTotalLength();
+      gsap.set(arc, { strokeDasharray: alen, strokeDashoffset: alen });
+      tl.fromTo(arc, { strokeDashoffset: alen }, { strokeDashoffset: 0, duration: 0.85, ease: "power2.inOut" }, 7.75);
+      tl.fromTo("#s4-arcarrow", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 8.55);
+      tl.fromTo("#s4-loopnote", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 8.5);
+      // one traveler on the return path
+      const pts = [];
+      for (let i = 0; i <= 40; i++) {
+        const p = arc.getPointAtLength((alen * i) / 40);
+        pts.push({ x: p.x, y: p.y });
+      }
+      gsap.set("#s4-trip", { x: pts[0].x, y: pts[0].y, opacity: 0 });
+      tl.set("#s4-trip", { opacity: 1 }, 8.6);
+      for (let i = 1; i <= 40; i++) {
+        tl.set("#s4-trip", { x: pts[i].x, y: pts[i].y }, 8.6 + i * 0.02);
+      }
+
+      window.__timelines["s4"] = tl;
+    })();
+  </script>
+</template>

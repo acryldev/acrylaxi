@@ -86,8 +86,8 @@ const COMMANDS = new Set([
 // the bare-arg normalization below would rewrite them into the hidden `open` command.
 const RESERVED = new Set(RESERVED_COMMANDS);
 const DESCRIPTION =
-  "Lavish Editor helps agents turn rich HTML artifacts into collaborative human review surfaces. Whenever you are about to give user a complex response that will be easier to understand via a rich / interactive page, consider using Lavish Editor. " +
-  "First generate an interactive HTML artifact according to user request, then run `lavish-axi <html-file>` so the user can visually review it, annotate elements or selected text, queue prompts, and send feedback back through `lavish-axi poll`.";
+  "Acrylaxi helps agents turn rich HTML artifacts into collaborative human review surfaces. Whenever you are about to give user a complex response that will be easier to understand via a rich / interactive page, consider using Acrylaxi. " +
+  "First generate an interactive HTML artifact according to user request, then run `acrylaxi <html-file>` so the user can visually review it, annotate elements or selected text, queue prompts, and send feedback back through `acrylaxi poll`.";
 export const POLL_WAKE_PATH_RULES = Object.freeze([
   "Keep the poll in the foreground by default and let it return the feedback directly to the agent.",
   "A background poll is allowed only through a harness-native tracked background-job facility whose completion result is guaranteed to resume or notify the same agent.",
@@ -104,18 +104,18 @@ export const POLL_AGENT_REPLY_RULE =
 const POLL_AGENT_REPLY_HELP_POINTER =
   "The Conversation panel's Markdown subset is in README's Feedback controls bullet.";
 const POLL_AGENT_REPLY_NEXT_POINTER =
-  "The Conversation panel's Markdown subset is in `lavish-axi poll --help` and README.";
+  "The Conversation panel's Markdown subset is in `acrylaxi poll --help` and README.";
 const POLL_VALUE_FLAGS = ["--agent-reply", "--agent-reply-file", "--timeout-ms", "--owner"];
 const AGENT_REPLY_JSON_LIMIT_BYTES = 2 * 1024 * 1024;
 const AGENT_REPLY_JSON_ENVELOPE_BYTES = Buffer.byteLength(JSON.stringify({ agent_reply: "" }));
 const AGENT_REPLY_INPUT_LIMIT_BYTES = AGENT_REPLY_JSON_LIMIT_BYTES - AGENT_REPLY_JSON_ENVELOPE_BYTES;
 const AGENT_REPLY_LIMIT_LABEL = "2 MB JSON request limit";
-const POLL_STATE_HEADER = "lavish-poll-state";
+const POLL_STATE_HEADER = "acrylaxi-poll-state";
 const CODEX_POLL_WAKE_PATH_GUIDANCE =
   "Codex detected: completed background tasks may not resume Codex automatically, so keep the poll attached to the active turn.";
 // Inlined at build time from package.json; falls back to reading package.json so source-run tests work.
 export const VERSION =
-  process.env.LAVISH_AXI_BUILD_VERSION ||
+  process.env.ACRYLAXI_BUILD_VERSION ||
   JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).version;
 
 export function detectInvokingAgent(env = process.env) {
@@ -127,7 +127,7 @@ export function shouldNarratePollWaitTicks({ isTTY }) {
 }
 
 export function herdrPollChimeEnabled(env = process.env) {
-  return env.HERDR_ENV === "1" && env.LAVISH_AXI_HERDR_CHIME === "1";
+  return env.HERDR_ENV === "1" && env.ACRYLAXI_HERDR_CHIME === "1";
 }
 
 /**
@@ -144,9 +144,9 @@ export function notifyHerdrPollReady({ env = process.env, runner = spawn } = {})
       [
         "notification",
         "show",
-        "Lavish review ready",
+        "Acrylaxi review ready",
         "--body",
-        "The artifact is open and Lavish is polling for your feedback.",
+        "The artifact is open and Acrylaxi is polling for your feedback.",
         "--sound",
         "request",
       ],
@@ -202,7 +202,7 @@ export async function run(argv) {
   const isTopLevelHelp = argv.length === 1 && argv[0] === "--help";
   const command = telemetryCommandName(argv);
   const telemetry = initDefaultTelemetry({
-    app: "lavish-axi",
+    app: "acrylaxi",
     version: VERSION,
     platform: process.platform,
     arch: process.arch,
@@ -216,7 +216,7 @@ export async function run(argv) {
       topLevelHelp: createTopLevelHelp({ agent }),
       home: async () =>
         createHomeOutput({
-          bin: process.argv[1] || "lavish-axi",
+          bin: process.argv[1] || "acrylaxi",
           sessions: isTopLevelHelp ? [] : await visibleSessions(),
           includeSessions: !isTopLevelHelp,
           agent,
@@ -299,20 +299,20 @@ export function createHomeOutput({ bin, sessions, includeSessions = true, agent 
     ],
     playbooks: listPlaybooks(),
     help: [
-      "Run `lavish-axi <html-file>` to open or resume a Lavish Editor session. If the user explicitly ended the session from the browser, this refuses to reopen it and explains why instead of reopening uninvited - pass `--reopen` only when the user asks for further review or something important needs their visual attention",
-      "Unless the user specifies another location, create HTML artifacts in the current working directory under `.lavish/`",
-      "Lavish serves the html file through a local express.js server. If your html needs to reference other filesystem assets such as images, CSS, fonts, and local scripts, copy them into the same directory as the HTML file, then reference them with relative paths from that directory. Never prepend `/` to those asset paths - root paths won't work",
-      `Run \`lavish-axi poll <html-file>\` to wait for user feedback. It long-polls and stays silent until the user sends feedback, ends the session, or leaves every review window disconnected past the reconnect grace period, so leave it running - never kill it. Detected layout issues never return this poll: the browser files them in the user's Layout issues inbox in the Lavish top bar, and they arrive as an ordinary tag "layout-warnings" prompt only when the user selects them and queues the fixes. Never edit the artifact to chase a layout issue the user has not queued. The only exception is a fatal artifact_failures response, which means the review surface itself could not be used. ${pollExecutionGuidance({ agent })} ${POLL_SEND_AND_END_RULE}`,
-      'Run `lavish-axi reply <html-file> --agent-reply "<message>"` to show a concise reply and exit once Lavish Editor accepts it, when you are handing a result back and are not about to long-poll. The board stops showing Working only after this command exits 0. Use `lavish-axi poll <html-file> --agent-reply "<message>"` when that reply should be followed by another wait for feedback. A longer reply uses `--agent-reply-file <path>` (`-` reads stdin) on either command. Run `lavish-axi reply --help` for the receipt contract',
+      "Run `acrylaxi <html-file>` to open or resume an Acrylaxi session. If the user explicitly ended the session from the browser, this refuses to reopen it and explains why instead of reopening uninvited - pass `--reopen` only when the user asks for further review or something important needs their visual attention",
+      "Unless the user specifies another location, create HTML artifacts in the current working directory under `.acrylaxi/`",
+      "Acrylaxi serves the html file through a local express.js server. If your html needs to reference other filesystem assets such as images, CSS, fonts, and local scripts, copy them into the same directory as the HTML file, then reference them with relative paths from that directory. Never prepend `/` to those asset paths - root paths won't work",
+      `Run \`acrylaxi poll <html-file>\` to wait for user feedback. It long-polls and stays silent until the user sends feedback, ends the session, or leaves every review window disconnected past the reconnect grace period, so leave it running - never kill it. Detected layout issues never return this poll: the browser files them in the user's Layout issues inbox in the Acrylaxi top bar, and they arrive as an ordinary tag "layout-warnings" prompt only when the user selects them and queues the fixes. Never edit the artifact to chase a layout issue the user has not queued. The only exception is a fatal artifact_failures response, which means the review surface itself could not be used. ${pollExecutionGuidance({ agent })} ${POLL_SEND_AND_END_RULE}`,
+      'Run `acrylaxi reply <html-file> --agent-reply "<message>"` to show a concise reply and exit once Acrylaxi accepts it, when you are handing a result back and are not about to long-poll. The board stops showing Working only after this command exits 0. Use `acrylaxi poll <html-file> --agent-reply "<message>"` when that reply should be followed by another wait for feedback. A longer reply uses `--agent-reply-file <path>` (`-` reads stdin) on either command. Run `acrylaxi reply --help` for the receipt contract',
       'Mermaid is the whiteboard opt-in, not the diagram default: only when the user asks for an editable whiteboard, author that diagram as Mermaid in a `.mermaid` container. Rendered Mermaid diagrams there become embedded, editable Excalidraw whiteboards in the browser (click a diagram to unlock editing; a Fullscreen action opens it over the whole viewport) - flowchart, sequence, class, ER, and state diagrams convert to editable shapes; other types embed as an image to draw on. Scenes autosave locally; an unmodified autosave silently re-converts when a reload changes the Mermaid source. If the reviewer edited the scene, they choose to re-convert and discard saved edits or keep editing the saved scene. Standalone and exported copies still render plain Mermaid. Queue feedback adds a prompt to the Conversation panel; when the user sends it, poll returns a tag "whiteboard" prompt carrying a bounded edit summary plus local scenePath (.excalidraw JSON) and previewPath (PNG) files - read the summary first, open the files only when needed, then apply the edits by updating the Mermaid source in the artifact (never try to write the scene back)',
-      "Run `lavish-axi end <html-file>` to end a session as the agent - ending it this way still allows a plain reopen later. When the user ends it from the browser instead, a later `lavish-axi <html-file>` refuses to reopen it without `--reopen`",
-      "Run `lavish-axi export <html-file> [--out <path>]` to write a portable copy of the artifact - one HTML file with its LOCAL assets inlined - so it opens with no Lavish server and no sibling files. Remote CDN/font references are left as links, so it needs network to render those. Users can also export from the browser chrome's overflow menu",
-      "Run `lavish-axi share <html-file> [--private | --password <pw>]` to publish the artifact on ht-ml.app (https://ht-ml.app), a third-party hosting service not part of Lavish, and get back a visitable URL. Shares are PUBLIC by default, so anyone with the link can open them. Pass --private to publish a PRIVATE page behind a password Lavish generates and returns - hand the user that password with the URL and say it is a shared secret anyone they give it to can use; --password <pw> uses one you were already given instead. Local assets are inlined; remote refs load over the network. It also returns a secret update_key that can republish or lock the same URL later - run `lavish-axi share --help` before using it. Users can also publish from the browser chrome's overflow menu",
-      "A request under a hostname Lavish does not answer to (a reverse-proxy name, a LAN IP) gets 403 `forbidden host`. Set `LAVISH_AXI_ALLOWED_HOSTS` in the environment that starts the server, running `lavish-axi stop` first if one is already up. See README's Allowed hosts section for the rules",
-      "Run `lavish-axi stop` to shut down the background server (it also self-stops when idle or after the last session ends with nothing connected)",
-      `Run \`lavish-axi playbook <playbook_id>\` for focused artifact guidance. ${PLAYBOOK_ROUTER_HELP}`,
+      "Run `acrylaxi end <html-file>` to end a session as the agent - ending it this way still allows a plain reopen later. When the user ends it from the browser instead, a later `acrylaxi <html-file>` refuses to reopen it without `--reopen`",
+      "Run `acrylaxi export <html-file> [--out <path>]` to write a portable copy of the artifact - one HTML file with its LOCAL assets inlined - so it opens with no Acrylaxi server and no sibling files. Remote CDN/font references are left as links, so it needs network to render those. Users can also export from the browser chrome's overflow menu",
+      "Run `acrylaxi share <html-file> [--private | --password <pw>]` to publish the artifact on ht-ml.app (https://ht-ml.app), a third-party hosting service not part of Acrylaxi, and get back a visitable URL. Shares are PUBLIC by default, so anyone with the link can open them. Pass --private to publish a PRIVATE page behind a password Acrylaxi generates and returns - hand the user that password with the URL and say it is a shared secret anyone they give it to can use; --password <pw> uses one you were already given instead. Local assets are inlined; remote refs load over the network. It also returns a secret update_key that can republish or lock the same URL later - run `acrylaxi share --help` before using it. Users can also publish from the browser chrome's overflow menu",
+      "A request under a hostname Acrylaxi does not answer to (a reverse-proxy name, a LAN IP) gets 403 `forbidden host`. Set `ACRYLAXI_ALLOWED_HOSTS` in the environment that starts the server, running `acrylaxi stop` first if one is already up. See README's Allowed hosts section for the rules",
+      "Run `acrylaxi stop` to shut down the background server (it also self-stops when idle or after the last session ends with nothing connected)",
+      `Run \`acrylaxi playbook <playbook_id>\` for focused artifact guidance. ${PLAYBOOK_ROUTER_HELP}`,
       DESIGN_SYSTEM_HINT,
-      "Use lavish-axi when the user asks for a visual artifact, HTML explainer, interactive prototype, review surface, product or technical plan, comparison, report, or browser-based feedback loop",
+      "Use acrylaxi when the user asks for a visual artifact, HTML explainer, interactive prototype, review surface, product or technical plan, comparison, report, or browser-based feedback loop",
     ],
   };
 }
@@ -322,14 +322,14 @@ export function createPlaybookOutput(args) {
   if (!id) {
     return {
       playbooks: listPlaybooks(),
-      help: ["Run `lavish-axi playbook <playbook_id>` for focused artifact guidance", PLAYBOOK_ROUTER_HELP],
+      help: ["Run `acrylaxi playbook <playbook_id>` for focused artifact guidance", PLAYBOOK_ROUTER_HELP],
     };
   }
 
   const playbook = findPlaybook(id);
   if (!playbook) {
     throw new AxiError(`Unknown playbook: ${id}`, "VALIDATION_ERROR", [
-      `Run \`lavish-axi playbook\` to list known IDs: ${playbookIds().join(", ")}`,
+      `Run \`acrylaxi playbook\` to list known IDs: ${playbookIds().join(", ")}`,
     ]);
   }
 
@@ -345,22 +345,22 @@ export function createOpenOutput({
   networkWarning = undefined,
 }) {
   const selfPaintPrefix = selfPaintWarning
-    ? `First fix the unpainted page surface flagged in self_paint_warning and save - Lavish live-reloads the artifact automatically, so you do not need to re-run \`lavish-axi ${file}\`. `
+    ? `First fix the unpainted page surface flagged in self_paint_warning and save - Acrylaxi live-reloads the artifact automatically, so you do not need to re-run \`acrylaxi ${file}\`. `
     : "";
   // A failed bind is invisible to the person holding a review link at that address - the page
   // simply does not load - so the agent is told to pass it on rather than leave it in a field.
   const networkPrefix = networkWarning
-    ? "Lavish could not serve every address it was asked to (see network_warning): when you next message the user, tell them, because review links at that address will not load until it clears. "
+    ? "Acrylaxi could not serve every address it was asked to (see network_warning): when you next message the user, tell them, because review links at that address will not load until it clears. "
     : "";
   return {
     session: { file, url, status },
     ...(networkWarning ? { network_warning: networkWarning } : {}),
     ...(selfPaintWarning ? { self_paint_warning: selfPaintWarning } : {}),
-    next_step: `${networkPrefix}${selfPaintPrefix}Do not respond to the user just yet. Now you must run \`lavish-axi poll ${file}\`. This command long-polls until the user sends feedback, ends the session, or leaves every review window disconnected past the reconnect grace period, and it stays silent the whole time - that is normal, never kill it. Layout issues the browser detects do not return this poll; they wait in the user's Layout issues inbox until the user queues them, then arrive as an ordinary tag "layout-warnings" prompt. Do not pass --timeout-ms during normal agent use. ${pollExecutionGuidance({ agent })} After applying feedback, run \`lavish-axi poll ${file} --agent-reply "<message for the user>"\` without --timeout-ms to show a concise response in Lavish Editor and keep waiting for more feedback. If instead you are handing back a result without starting another long-poll, run \`lavish-axi reply ${file} --agent-reply "<message for the user>"\` to get an acceptance receipt. ${POLL_AGENT_REPLY_RULE} ${POLL_AGENT_REPLY_NEXT_POINTER} If the user ends the session, stop polling and do not reopen it by re-running \`lavish-axi ${file}\` unless the user asks for further review or something genuinely important needs their visual attention - deliver routine updates directly in this conversation instead. When reopening is warranted, run \`lavish-axi ${file} --reopen\`.`,
+    next_step: `${networkPrefix}${selfPaintPrefix}Do not respond to the user just yet. Now you must run \`acrylaxi poll ${file}\`. This command long-polls until the user sends feedback, ends the session, or leaves every review window disconnected past the reconnect grace period, and it stays silent the whole time - that is normal, never kill it. Layout issues the browser detects do not return this poll; they wait in the user's Layout issues inbox until the user queues them, then arrive as an ordinary tag "layout-warnings" prompt. Do not pass --timeout-ms during normal agent use. ${pollExecutionGuidance({ agent })} After applying feedback, run \`acrylaxi poll ${file} --agent-reply "<message for the user>"\` without --timeout-ms to show a concise response in Acrylaxi and keep waiting for more feedback. If instead you are handing back a result without starting another long-poll, run \`acrylaxi reply ${file} --agent-reply "<message for the user>"\` to get an acceptance receipt. ${POLL_AGENT_REPLY_RULE} ${POLL_AGENT_REPLY_NEXT_POINTER} If the user ends the session, stop polling and do not reopen it by re-running \`acrylaxi ${file}\` unless the user asks for further review or something genuinely important needs their visual attention - deliver routine updates directly in this conversation instead. When reopening is warranted, run \`acrylaxi ${file} --reopen\`.`,
   };
 }
 
-// Shown when a plain `lavish-axi <file>` targets a session the user explicitly ended from the
+// Shown when a plain `acrylaxi <file>` targets a session the user explicitly ended from the
 // browser. Reviving it silently would reopen a browser window the human deliberately closed, so
 // this refuses and requires the explicit --reopen opt-in instead of erroring - the session
 // staying closed is the correct, idempotent outcome unless the agent has a real reason to reopen.
@@ -368,14 +368,14 @@ export function createUserEndedOpenOutput({ file, url, networkWarning = undefine
   return {
     session: { file, url, status: "user-ended" },
     ...(networkWarning ? { network_warning: networkWarning } : {}),
-    next_step: `The user explicitly ended this Lavish Editor session from the browser, so \`lavish-axi ${file}\` did not reopen it. Do not reopen unless the user asks for further review or something genuinely important needs their visual attention - deliver routine updates directly in this conversation instead. When reopening is warranted, run \`lavish-axi ${file} --reopen\`.`,
+    next_step: `The user explicitly ended this Acrylaxi session from the browser, so \`acrylaxi ${file}\` did not reopen it. Do not reopen unless the user asks for further review or something genuinely important needs their visual attention - deliver routine updates directly in this conversation instead. When reopening is warranted, run \`acrylaxi ${file} --reopen\`.`,
   };
 }
 
 async function openCommand(args) {
   const file = firstPositionalArg(args);
   if (!file) {
-    throw new AxiError("HTML file path is required", "VALIDATION_ERROR", ["Run `lavish-axi <html-file>`"]);
+    throw new AxiError("HTML file path is required", "VALIDATION_ERROR", ["Run `acrylaxi <html-file>`"]);
   }
   await assertHtmlFile(file);
   const absolute = await canonicalFile(file);
@@ -423,13 +423,13 @@ async function selfPaintWarningForFile(absolute) {
 }
 
 export function shouldOpenBrowser(args, env) {
-  return !args.includes("--no-open") && env.LAVISH_AXI_NO_OPEN !== "1";
+  return !args.includes("--no-open") && env.ACRYLAXI_NO_OPEN !== "1";
 }
 
 async function pollCommand(args) {
   const file = firstPositionalArg(args, POLL_VALUE_FLAGS);
   if (!file) {
-    throw new AxiError("HTML file path is required", "VALIDATION_ERROR", ["Run `lavish-axi poll <html-file>`"]);
+    throw new AxiError("HTML file path is required", "VALIDATION_ERROR", ["Run `acrylaxi poll <html-file>`"]);
   }
   const ownerFlag = inspectValueFlag(args, "--owner");
   const owner = ownerFlag.present ? String(ownerFlag.value || "").trim() : null;
@@ -491,8 +491,8 @@ async function pollCommand(args) {
       },
     });
     if (response.code === "LISTENER_REPLACED") {
-      throw new AxiError("Lavish Editor poll listener was replaced by a takeover", "LISTENER_REPLACED", [
-        `Re-run lavish-axi poll ${absolute} only if you intend to take over listening`,
+      throw new AxiError("Acrylaxi poll listener was replaced by a takeover", "LISTENER_REPLACED", [
+        `Re-run acrylaxi poll ${absolute} only if you intend to take over listening`,
       ]);
     }
     return createPollOutput({ file: absolute, response, agent: detectInvokingAgent(process.env) });
@@ -506,13 +506,13 @@ async function pollCommand(args) {
 }
 
 const REPLY_VALUE_FLAGS = ["--agent-reply", "--agent-reply-file"];
-const REPLY_TOO_LARGE_HELP = "Shorten the reply, then retry `lavish-axi reply <html-file>`";
+const REPLY_TOO_LARGE_HELP = "Shorten the reply, then retry `acrylaxi reply <html-file>`";
 
 async function replyCommand(args) {
   const file = firstPositionalArg(args, REPLY_VALUE_FLAGS);
   if (!file) {
     throw new AxiError("HTML file path is required", "VALIDATION_ERROR", [
-      'Run `lavish-axi reply <html-file> --agent-reply "<message>"`',
+      'Run `acrylaxi reply <html-file> --agent-reply "<message>"`',
     ]);
   }
   const inline = inspectValueFlag(args, "--agent-reply");
@@ -520,7 +520,7 @@ async function replyCommand(args) {
   if (!inline.present && !fromFile.present) {
     throw new AxiError("An agent reply is required", "VALIDATION_ERROR", [
       'Pass exactly one of --agent-reply "<message>" or --agent-reply-file <path> (`-` reads stdin)',
-      "Use `lavish-axi poll <html-file> --agent-reply` when the reply should be followed by a wait for feedback",
+      "Use `acrylaxi poll <html-file> --agent-reply` when the reply should be followed by a wait for feedback",
     ]);
   }
   const text = await resolveAgentReply(args, { tooLargeHelp: REPLY_TOO_LARGE_HELP });
@@ -539,27 +539,27 @@ async function replyCommand(args) {
 function createReplyOutput(file) {
   return {
     reply: { file, status: "sent" },
-    next_step: `Lavish Editor accepted the reply for ${file} and is no longer showing Working. Run \`lavish-axi poll ${file}\` when you are ready to wait for more feedback.`,
+    next_step: `Acrylaxi accepted the reply for ${file} and is no longer showing Working. Run \`acrylaxi poll ${file}\` when you are ready to wait for more feedback.`,
   };
 }
 
 export function pollWaitBannerText(file) {
   return (
-    `[lavish-axi] Long-polling for user feedback on ${file}. This stays silent until the user sends feedback, ends the session, or leaves every review window disconnected past the reconnect grace period - leave it running. ` +
+    `[acrylaxi] Long-polling for user feedback on ${file}. This stays silent until the user sends feedback, ends the session, or leaves every review window disconnected past the reconnect grace period - leave it running. ` +
     `Detected layout issues do NOT return this poll: they wait in the user's Layout issues inbox until the user queues them as ordinary feedback. ` +
-    `If it gets killed or times out before feedback arrives, re-run \`lavish-axi poll ${file}\` - feedback remains queued until delivery. Poll delivery consumes the response, so read it completely.`
+    `If it gets killed or times out before feedback arrives, re-run \`acrylaxi poll ${file}\` - feedback remains queued until delivery. Poll delivery consumes the response, so read it completely.`
   );
 }
 
 export function pollWaitTickText(elapsedMs) {
   const minutes = Math.round(elapsedMs / 60_000);
-  return `[lavish-axi] Still waiting for user feedback (${minutes}m). Leave this running until the user sends feedback, ends the session, or leaves every review window disconnected.`;
+  return `[acrylaxi] Still waiting for user feedback (${minutes}m). Leave this running until the user sends feedback, ends the session, or leaves every review window disconnected.`;
 }
 
 export function pollInterruptedText(file) {
   return (
-    `[lavish-axi] Poll interrupted before user feedback arrived. The user may still be reviewing - ` +
-    `re-run \`lavish-axi poll ${file}\` to keep waiting; feedback remains queued until delivery. Poll delivery consumes the response, so read it completely.`
+    `[acrylaxi] Poll interrupted before user feedback arrived. The user may still be reviewing - ` +
+    `re-run \`acrylaxi poll ${file}\` to keep waiting; feedback remains queued until delivery. Poll delivery consumes the response, so read it completely.`
   );
 }
 
@@ -593,9 +593,7 @@ export function startPollWaitReporter({
  */
 export function createPollOutput({ file, response, agent = "generic" }) {
   if (response.status === "missing") {
-    throw new AxiError("No active Lavish Editor session for this file", "NOT_FOUND", [
-      `Run \`lavish-axi ${file}\` first`,
-    ]);
+    throw new AxiError("No active Acrylaxi session for this file", "NOT_FOUND", [`Run \`acrylaxi ${file}\` first`]);
   }
   if (response.status === "feedback") {
     const artifactFailures = Array.isArray(response.artifact_failures) ? response.artifact_failures : [];
@@ -623,22 +621,22 @@ export function createPollOutput({ file, response, agent = "generic" }) {
     return {
       session: { file, status: "browser_disconnected" },
       next_step:
-        "The Lavish review window was closed or disconnected. The session remains open and resumable; ask the user whether they want to reopen it or end the session. Do not reopen or end it without their direction.",
+        "The Acrylaxi review window was closed or disconnected. The session remains open and resumable; ask the user whether they want to reopen it or end the session. Do not reopen or end it without their direction.",
     };
   }
   return {
     session: { file, status: response.status || "waiting" },
-    next_step: `No user feedback arrived before the optional timeout. Run \`lavish-axi poll ${file}\` without --timeout-ms to wait indefinitely - feedback remains queued until delivery, so re-running the poll is safe while waiting. Poll delivery consumes the response, so read it completely.`,
+    next_step: `No user feedback arrived before the optional timeout. Run \`acrylaxi poll ${file}\` without --timeout-ms to wait indefinitely - feedback remains queued until delivery, so re-running the poll is safe while waiting. Poll delivery consumes the response, so read it completely.`,
   };
 }
 
 function createFeedbackNextStep(file, artifactFailures, sessionEnded, endedBy, prompts = [], agent = "generic") {
   const count = artifactFailures.length;
   const whiteboardNote = prompts.some((prompt) => prompt && prompt.tag === "whiteboard")
-    ? `This feedback includes whiteboard edits (tag "whiteboard"): read the edit summary in the prompt text first, and only when it is not enough, open the target's scenePath (.excalidraw scene JSON) or previewPath (PNG) local files for detail. The artifact's Mermaid source stays authoritative - apply the edits by updating the Mermaid text in ${file} (Lavish live-reloads it); never try to write the .excalidraw scene back. `
+    ? `This feedback includes whiteboard edits (tag "whiteboard"): read the edit summary in the prompt text first, and only when it is not enough, open the target's scenePath (.excalidraw scene JSON) or previewPath (PNG) local files for detail. The artifact's Mermaid source stays authoritative - apply the edits by updating the Mermaid text in ${file} (Acrylaxi live-reloads it); never try to write the .excalidraw scene back. `
     : "";
   const layoutNote = prompts.some((prompt) => prompt && prompt.tag === "layout-warnings")
-    ? `This feedback includes layout issues the user selected from the Lavish Layout issues inbox (tag "layout-warnings"): the target lists the exact warning ids and targets. Apply every listed fix in one pass before saving so the user's review refreshes once. Queueing is a repair request, not a resolution - Lavish only marks a warning resolved after a newer artifact load and a complete check at the same viewport no longer detects it. `
+    ? `This feedback includes layout issues the user selected from the Acrylaxi Layout issues inbox (tag "layout-warnings"): the target lists the exact warning ids and targets. Apply every listed fix in one pass before saving so the user's review refreshes once. Queueing is a repair request, not a resolution - Acrylaxi only marks a warning resolved after a newer artifact load and a complete check at the same viewport no longer detects it. `
     : "";
   const attachmentNote = prompts.some((prompt) => Array.isArray(prompt?.attachments) && prompt.attachments.length)
     ? `Some prompts carry image attachments the user added: each is an object in the prompt's \`attachments\` array with an absolute local \`path\` (plus id, mime, and dimensions). Open those image files to see what the user is referring to. `
@@ -647,21 +645,21 @@ function createFeedbackNextStep(file, artifactFailures, sessionEnded, endedBy, p
     const failureNote =
       count > 0
         ? endedBy === "user"
-          ? `${count} fatal artifact failure${count === 1 ? "" : "s"} arrived alongside this final feedback - the review surface itself could not be used. Repair ${file}, then open it directly and confirm it renders without reopening this ended Lavish session. `
-          : `${count} fatal artifact failure${count === 1 ? "" : "s"} arrived alongside this final feedback - the review surface itself could not be used. Repair ${file}, then run \`lavish-axi ${file}\` to open a fresh session. `
+          ? `${count} fatal artifact failure${count === 1 ? "" : "s"} arrived alongside this final feedback - the review surface itself could not be used. Repair ${file}, then open it directly and confirm it renders without reopening this ended Acrylaxi session. `
+          : `${count} fatal artifact failure${count === 1 ? "" : "s"} arrived alongside this final feedback - the review surface itself could not be used. Repair ${file}, then run \`acrylaxi ${file}\` to open a fresh session. `
         : "";
     if (endedBy === "user") {
       const reopenNote =
         count > 0
           ? ""
-          : ` Only run \`lavish-axi ${file} --reopen\` if the user explicitly asks for further review or something genuinely important needs their visual attention.`;
+          : ` Only run \`acrylaxi ${file} --reopen\` if the user explicitly asks for further review or something genuinely important needs their visual attention.`;
       return `${failureNote}${layoutNote}${whiteboardNote}${attachmentNote}This was the last feedback before the user ended the session. Stop polling ${file} and do not reopen it - deliver any remaining updates directly in this conversation instead.${reopenNote}`;
     }
-    return `${failureNote}${layoutNote}${whiteboardNote}${attachmentNote}This was the last feedback before the Lavish Editor session ended. Stop polling ${file}. Deliver any remaining updates directly in this conversation, or run \`lavish-axi ${file}\` to open a fresh session if the user needs further visual review.`;
+    return `${failureNote}${layoutNote}${whiteboardNote}${attachmentNote}This was the last feedback before the Acrylaxi session ended. Stop polling ${file}. Deliver any remaining updates directly in this conversation, or run \`acrylaxi ${file}\` to open a fresh session if the user needs further visual review.`;
   }
   const prefix =
     count > 0 ? artifactFailuresPrefix(file, artifactFailures) : `Apply the requested changes to ${file}. `;
-  return `${prefix}${layoutNote}${whiteboardNote}${attachmentNote}Do not respond to the user just yet. If you are continuing to wait for feedback, run \`lavish-axi poll ${file} --agent-reply "<message for the user>"\` without --timeout-ms to reply and keep polling. If instead you are handing back a result without starting another long-poll, run \`lavish-axi reply ${file} --agent-reply "<message for the user>"\` to post it and receive an acceptance receipt. ${POLL_AGENT_REPLY_RULE} ${POLL_AGENT_REPLY_NEXT_POINTER} The poll waits silently until the user sends more feedback, ends the session, or leaves every review window disconnected past the reconnect grace period - never kill it. ${pollExecutionGuidance({ agent })}`;
+  return `${prefix}${layoutNote}${whiteboardNote}${attachmentNote}Do not respond to the user just yet. If you are continuing to wait for feedback, run \`acrylaxi poll ${file} --agent-reply "<message for the user>"\` without --timeout-ms to reply and keep polling. If instead you are handing back a result without starting another long-poll, run \`acrylaxi reply ${file} --agent-reply "<message for the user>"\` to post it and receive an acceptance receipt. ${POLL_AGENT_REPLY_RULE} ${POLL_AGENT_REPLY_NEXT_POINTER} The poll waits silently until the user sends more feedback, ends the session, or leaves every review window disconnected past the reconnect grace period - never kill it. ${pollExecutionGuidance({ agent })}`;
 }
 
 // The narrow fatal path. Ordinary layout findings never reach the poll: they wait in the user's
@@ -674,20 +672,20 @@ function artifactFailuresPrefix(file, artifactFailures) {
     .map((failure) => `${failure.kind}: ${failure.detail}`)
     .slice(0, 5)
     .join("; ");
-  return `${count} fatal artifact failure${plural} detected - the review surface could not be used (${details}). Repair ${file} so it renders with all of its local assets, then re-check in the browser. Lavish live-reloads the artifact automatically after you save, so you do not need to re-run \`lavish-axi ${file}\` for this. `;
+  return `${count} fatal artifact failure${plural} detected - the review surface could not be used (${details}). Repair ${file} so it renders with all of its local assets, then re-check in the browser. Acrylaxi live-reloads the artifact automatically after you save, so you do not need to re-run \`acrylaxi ${file}\` for this. `;
 }
 
 function createEndedNextStep(file, endedBy) {
   if (endedBy === "user") {
-    return `The user ended this Lavish Editor session. Stop polling ${file} - do not run \`lavish-axi ${file}\` to reopen it. Deliver any remaining updates directly in this conversation instead. Only reopen with \`lavish-axi ${file} --reopen\` if the user explicitly asks for further review or something genuinely important needs their visual attention.`;
+    return `The user ended this Acrylaxi session. Stop polling ${file} - do not run \`acrylaxi ${file}\` to reopen it. Deliver any remaining updates directly in this conversation instead. Only reopen with \`acrylaxi ${file} --reopen\` if the user explicitly asks for further review or something genuinely important needs their visual attention.`;
   }
-  return `This Lavish Editor session for ${file} has ended. Stop polling. Deliver any remaining updates directly in this conversation, or run \`lavish-axi ${file}\` to open a fresh session if the user needs further visual review.`;
+  return `This Acrylaxi session for ${file} has ended. Stop polling. Deliver any remaining updates directly in this conversation, or run \`acrylaxi ${file}\` to open a fresh session if the user needs further visual review.`;
 }
 
 async function endCommand(args) {
   const file = firstPositionalArg(args);
   if (!file) {
-    throw new AxiError("HTML file path is required", "VALIDATION_ERROR", ["Run `lavish-axi end <html-file>`"]);
+    throw new AxiError("HTML file path is required", "VALIDATION_ERROR", ["Run `acrylaxi end <html-file>`"]);
   }
   const absolute = await canonicalFile(file);
   const baseUrl = await ensureServer();
@@ -697,12 +695,12 @@ async function endCommand(args) {
 
 // Produce a portable copy of an artifact: one HTML file with its LOCAL assets (relative-path
 // stylesheets, scripts, images, fonts) inlined as data URIs. Remote CDN/font references are left
-// as-is for the browser to load, so the export needs network to render those. Lavish makes no
+// as-is for the browser to load, so the export needs network to render those. Acrylaxi makes no
 // outbound requests - export is a pure local file transform, server-independent.
 async function exportCommand(args) {
   const file = firstPositionalArg(args, ["--out"]);
   if (!file) {
-    throw new AxiError("HTML file path is required", "VALIDATION_ERROR", ["Run `lavish-axi export <html-file>`"]);
+    throw new AxiError("HTML file path is required", "VALIDATION_ERROR", ["Run `acrylaxi export <html-file>`"]);
   }
   await assertHtmlFile(file);
   const absolute = await canonicalFile(file);
@@ -743,9 +741,9 @@ export function createExportOutput({ source, output, html, warnings, selfPaintWa
     result.next_step =
       "Some LOCAL assets could not be inlined and were left as references (see unresolved_local_assets); they will break once the file is moved. Remote CDN/font references are intentionally left as links and render where there is network access.";
   } else if (notices.length) {
-    result.next_step = `Wrote ${output} with export notices (see notices). Open it directly or host it anywhere - it needs no Lavish server. Local assets are inlined; remote CDN/font references are left as links, so it needs network to render those.`;
+    result.next_step = `Wrote ${output} with export notices (see notices). Open it directly or host it anywhere - it needs no Acrylaxi server. Local assets are inlined; remote CDN/font references are left as links, so it needs network to render those.`;
   } else {
-    result.next_step = `Wrote ${output}. Open it directly or host it anywhere - it needs no Lavish server. Local assets are inlined; remote CDN/font references are left as links, so it needs network to render those.`;
+    result.next_step = `Wrote ${output}. Open it directly or host it anywhere - it needs no Acrylaxi server. Local assets are inlined; remote CDN/font references are left as links, so it needs network to render those.`;
   }
   if (selfPaintWarning) {
     result.self_paint_warning = selfPaintWarning;
@@ -813,10 +811,10 @@ export async function shareCommand(args) {
 // loudly when an agent substitutes the real values and leaves one literal - `<html-file>` is not a
 // file, `<key>` earns a 401 - but any non-empty string is a valid password, so a literal `<pw>`
 // would be accepted and would rotate a live page to a secret nobody was told, with no way to clear
-// it afterwards. `--private` is safe to name because it takes no value and Lavish reports what it
+// it afterwards. `--private` is safe to name because it takes no value and Acrylaxi reports what it
 // minted; an explicit password is described in words instead.
 function republishCommand(siteId, { privatePage = false } = {}) {
-  return `lavish-axi share <html-file> --site ${siteId} --update-key <key>${privatePage ? " --private" : ""}`;
+  return `acrylaxi share <html-file> --site ${siteId} --update-key <key>${privatePage ? " --private" : ""}`;
 }
 
 function republishPrivateCommand(siteId) {
@@ -824,7 +822,7 @@ function republishPrivateCommand(siteId) {
 }
 
 function unpublishCommand(siteId) {
-  return `lavish-axi share --unpublish --site ${siteId} --update-key <key>`;
+  return `acrylaxi share --unpublish --site ${siteId} --update-key <key>`;
 }
 
 // A 200 the host answered with an unreadable body is not an unknown outcome - the page landed - and
@@ -838,10 +836,10 @@ function incompletePublishError(request, message, received) {
     ? `behind the password this run sent`
     : `PUBLICLY, readable by anyone who has the link`;
   const suggestions = [
-    `ht-ml.app accepted this publish - the page IS live, hosted ${visibility} - but its response was malformed, so Lavish could not read the whole result back. Do not report this as a failed publish.`,
+    `ht-ml.app accepted this publish - the page IS live, hosted ${visibility} - but its response was malformed, so Acrylaxi could not read the whole result back. Do not report this as a failed publish.`,
     url
       ? `Its address is ${url} - give the user that URL.`
-      : `The response carried no url, so Lavish cannot name the page's address.`,
+      : `The response carried no url, so Acrylaxi cannot name the page's address.`,
   ];
   if (updateKey) {
     suggestions.push(
@@ -849,12 +847,12 @@ function incompletePublishError(request, message, received) {
     );
   } else {
     suggestions.push(
-      `No update_key reached Lavish, and ht-ml.app issues one only once and has no delete endpoint, so this page can never be republished or unpublished. There is no recovery for it.`,
+      `No update_key reached Acrylaxi, and ht-ml.app issues one only once and has no delete endpoint, so this page can never be republished or unpublished. There is no recovery for it.`,
     );
   }
   suggestions.push(`Re-running this command publishes a SECOND page at a new URL; it does not replace the first.`);
   if (request.generatedPassword && request.password) {
-    suggestions.push(`That page requires the password Lavish generated for it: ${request.password}`);
+    suggestions.push(`That page requires the password Acrylaxi generated for it: ${request.password}`);
   }
   return new AxiError(message, "UNKNOWN", suggestions);
 }
@@ -883,7 +881,7 @@ async function createShareSite(request, html) {
       `Re-running this command publishes a SECOND page at a new URL; it does not replace or reclaim the first.`,
     ];
     if (request.generatedPassword && request.password) {
-      suggestions.push(`If it landed, that page requires the password Lavish generated for it: ${request.password}`);
+      suggestions.push(`If it landed, that page requires the password Acrylaxi generated for it: ${request.password}`);
     }
     throw new AxiError(message, "UNKNOWN", suggestions);
   }
@@ -891,7 +889,7 @@ async function createShareSite(request, html) {
 
 // Whether the outcome is unknown is a property of the FAILURE, not of what the request carried: a
 // 4xx the host answered means it wrote nothing, while a 5xx or no answer at all can follow a PUT
-// the origin already committed, leaving the hosted page showing content Lavish reported as never
+// the origin already committed, leaving the hosted page showing content Acrylaxi reported as never
 // sent. So every indeterminate republish reports that and names a re-run that converges.
 // A generated password is an ADDITIONAL layer on that report, not its trigger: it only ever reaches
 // the user through the success output, so an indeterminate failure could otherwise leave the page
@@ -914,7 +912,7 @@ async function updateShareSite(request, html) {
     ];
     if (generated) {
       suggestions.push(
-        `If it landed, the page now requires the password Lavish generated for it: ${request.password} - the re-run above rotates it to a fresh one Lavish reports on success.`,
+        `If it landed, the page now requires the password Acrylaxi generated for it: ${request.password} - the re-run above rotates it to a fresh one Acrylaxi reports on success.`,
       );
     }
     throw new AxiError(message, "UNKNOWN", suggestions);
@@ -960,7 +958,7 @@ export function resolveShareRequest(args) {
 
   if (generate && explicitPassword) {
     throw new AxiError("--private generates a password, so it cannot be combined with --password", "VALIDATION_ERROR", [
-      "Pass --private to have Lavish mint one, or --password <pw> to choose it yourself",
+      "Pass --private to have Acrylaxi mint one, or --password <pw> to choose it yourself",
     ]);
   }
   // A republish authenticates as the page itself: the Authorization header carries the update_key,
@@ -976,14 +974,14 @@ export function resolveShareRequest(args) {
   if (unpublish) {
     if (file) {
       throw new AxiError("--unpublish replaces a published page and takes no HTML file", "VALIDATION_ERROR", [
-        "Run `lavish-axi share --unpublish --site <site_id> --update-key <key>`",
+        "Run `acrylaxi share --unpublish --site <site_id> --update-key <key>`",
       ]);
     }
     if (generate || explicitPassword) {
       throw new AxiError(
         "--unpublish locks the page with its own password and takes no password flag",
         "VALIDATION_ERROR",
-        ["Run `lavish-axi share --unpublish --site <site_id> --update-key <key>`"],
+        ["Run `acrylaxi share --unpublish --site <site_id> --update-key <key>`"],
       );
     }
     assertSiteCredential(siteId, updateKey);
@@ -1063,7 +1061,7 @@ function shareFlagValue(args, flag) {
 function checkedShareFlagValue(flag, value, { swallows = false }) {
   const hint =
     flag === "--password"
-      ? `Quote the value as ${flag} "<pw>" - an unquoted shell variable that is unset expands to nothing - or pass --private to have Lavish generate one`
+      ? `Quote the value as ${flag} "<pw>" - an unquoted shell variable that is unset expands to nothing - or pass --private to have Acrylaxi generate one`
       : `Quote the value as ${flag} "<value>"`;
   if (swallows && typeof value === "string" && value.startsWith("--")) {
     throw new AxiError(
@@ -1100,7 +1098,7 @@ function assertShareSiteId(siteId) {
 
 function assertShareFile(file) {
   if (!file) {
-    throw new AxiError("HTML file path is required", "VALIDATION_ERROR", ["Run `lavish-axi share <html-file>`"]);
+    throw new AxiError("HTML file path is required", "VALIDATION_ERROR", ["Run `acrylaxi share <html-file>`"]);
   }
 }
 
@@ -1141,10 +1139,10 @@ export function createShareOutput({
   if (notices.length) result.notices = assetWarningSummaries(notices);
   const noticeNote = notices.length ? " Export notices are available in notices." : "";
   const hostNote =
-    "ht-ml.app (https://ht-ml.app), a third-party host not part of Lavish, hosts the page, so it needs no Lavish server.";
+    "ht-ml.app (https://ht-ml.app), a third-party host not part of Acrylaxi, hosts the page, so it needs no Acrylaxi server.";
   const updateKeyNote = republishableSiteId
     ? "The update_key is a secret shown only once; keep it to republish the page later with --site and --update-key (there is no recovery, and ht-ml.app has no delete). "
-    : "The host did not return a site_id Lavish can use, and --site is half the republish credential, so this page can NEVER be republished or unpublished even though its update_key is in hand. Tell the user that now rather than letting them discover it later. ";
+    : "The host did not return a site_id Acrylaxi can use, and --site is half the republish credential, so this page can NEVER be republished or unpublished even though its update_key is in hand. Tell the user that now rather than letting them discover it later. ";
   if (unresolved.length) {
     result.next_step =
       `Published ${isPasswordProtected ? "a PASSWORD-PROTECTED page at " : ""}${site.url}, but some LOCAL assets could not be inlined and were left as references (see unresolved_local_assets); inspect the hosted page and fix missing local assets before sharing it.${passwordNote}${noticeNote} ` +
@@ -1172,9 +1170,9 @@ export function createShareOutput({
   return result;
 }
 
-// Republish output. Visibility is "unchanged" unless this call set a password, because Lavish
+// Republish output. Visibility is "unchanged" unless this call set a password, because Acrylaxi
 // persists nothing about a published page and the host never reports its current password. So a
-// plain republish reports what Lavish DID, never what the page IS: it cannot know whether the page
+// plain republish reports what Acrylaxi DID, never what the page IS: it cannot know whether the page
 // is gated, and an authoritative guess either way is one the user would act on.
 export function createShareUpdateOutput({
   source,
@@ -1211,7 +1209,7 @@ export function createShareUpdateOutput({
   const visibilityNote =
     visibility === "private"
       ? " It is PASSWORD-PROTECTED; viewers also need the password. That gate is NOT instant: if the page had been public, it was observed still answering uncredentialed requests from ht-ml.app's CDN cache for minutes afterwards, so do not tell the user it is gated right away; a page that was already private has no such cached copy and leaks nothing."
-      : " This republish did not touch the page's password, so whatever it had when it was last published still applies. Lavish stores nothing about a published page, so this output cannot tell you whether that is a password or none - and a page published without one stays readable by anyone who has the link.";
+      : " This republish did not touch the page's password, so whatever it had when it was last published still applies. Acrylaxi stores nothing about a published page, so this output cannot tell you whether that is a password or none - and a page published without one stays readable by anyone who has the link.";
   result.next_step = url
     ? `Republished ${source} to the same URL: ${url} - viewers see the new version immediately and no new link is needed.${visibilityNote}${unresolvedNote}${noticeNote} ` +
       `Keep the same update_key; it is still the only credential for this page.`
@@ -1255,12 +1253,12 @@ export function createShareUnpublishOutput({ site, siteId = undefined }) {
 
 function generatedPasswordNote(password) {
   return (
-    `The password is ${password} - Lavish generated it and does not store it anywhere. ` +
+    `The password is ${password} - Acrylaxi generated it and does not store it anywhere. ` +
     `Give it to the user with the URL and tell them it is a SHARED SECRET: anyone they pass it to can read the page.`
   );
 }
 
-// Explicitly shut down the running Lavish Editor server. Unlike `end` (which closes a single
+// Explicitly shut down the running Acrylaxi server. Unlike `end` (which closes a single
 // session), this stops the background process so it stops dangling between sessions.
 export async function stopCommand(args) {
   const port = Number(flagValue(args, "--port") || defaultPort());
@@ -1281,16 +1279,16 @@ export async function shutdownServerOnPort(
     fetchHealth: healthFetcher = fetchHealth,
     requestShutdown: shutdownRequester = requestShutdown,
     waitForPortFree: portFreeWaiter = waitForPortFree,
-    killServerProcess = killLavishListener,
-    processMatchesLavish = listenerMatchesLavish,
+    killServerProcess = killAcrylaxiListener,
+    processMatchesAcrylaxi = listenerMatchesAcrylaxi,
   } = {},
 ) {
   const health = await healthFetcher(baseUrl);
   if (!health) {
     return { server: { status: "not-running", port } };
   }
-  if (!(await canControlServerOnPort(baseUrl, health, processMatchesLavish))) {
-    return { server: { status: "not-lavish", port } };
+  if (!(await canControlServerOnPort(baseUrl, health, processMatchesAcrylaxi))) {
+    return { server: { status: "not-acrylaxi", port } };
   }
   await shutdownRequester(baseUrl, { reason: "stop" });
   let freed = await portFreeWaiter(baseUrl, 3000);
@@ -1344,9 +1342,9 @@ export function createLibrariesOutput({ dir, libraries, skipped, search = "", li
   }
   output.help = [
     output.more_items
-      ? "Narrow the list with `lavish-axi libraries --search <text>`"
-      : "Run `lavish-axi libraries --search <text>` or `--library <id>` to list item refs",
-    "To show an item as a node icon in a whiteboard flowchart, see `whiteboard_tooling.library_icons` in `lavish-axi design`",
+      ? "Narrow the list with `acrylaxi libraries --search <text>`"
+      : "Run `acrylaxi libraries --search <text>` or `--library <id>` to list item refs",
+    "To show an item as a node icon in a whiteboard flowchart, see `whiteboard_tooling.library_icons` in `acrylaxi design`",
   ];
   return output;
 }
@@ -1362,8 +1360,8 @@ async function designCommand() {
 async function setupCommand(args) {
   if (args.length !== 1 || (args[0] !== "hooks" && args[0] !== "plugin")) {
     throw new AxiError("Unknown setup action", "VALIDATION_ERROR", [
-      "Run `lavish-axi setup hooks`",
-      "Run `lavish-axi setup plugin`",
+      "Run `acrylaxi setup hooks`",
+      "Run `acrylaxi setup plugin`",
     ]);
   }
 
@@ -1371,9 +1369,9 @@ async function setupCommand(args) {
 
   const errors = [];
   installSessionStartHooks({
-    marker: "lavish-axi",
-    binaryNames: ["lavish-axi"],
-    distEntrypoints: ["dist/cli.mjs", "bin/lavish-axi.js"],
+    marker: "acrylaxi",
+    binaryNames: ["acrylaxi"],
+    distEntrypoints: ["dist/cli.mjs", "bin/acrylaxi.js"],
     homeDir: resolveHookHomeDir(),
     onError: (message) => errors.push(message),
   });
@@ -1383,14 +1381,14 @@ async function setupCommand(args) {
   });
 
   if (errors.length > 0) {
-    throw new AxiError("Failed to install lavish-axi agent hooks", "SERVER_ERROR", errors);
+    throw new AxiError("Failed to install acrylaxi agent hooks", "SERVER_ERROR", errors);
   }
 
   return {
     hooks: { status: "installed", integrations: "Claude Code, Codex, OpenCode, GitHub Copilot CLI" },
     help: [
-      "Restart your agent session to receive lavish-axi ambient context",
-      "Run `lavish-axi setup plugin` to also register the Agent Plugin in VS Code, Cursor, and GitHub Copilot CLI",
+      "Restart your agent session to receive acrylaxi ambient context",
+      "Run `acrylaxi setup plugin` to also register the Agent Plugin in VS Code, Cursor, and GitHub Copilot CLI",
     ],
   };
 }
@@ -1408,9 +1406,9 @@ async function setupPluginCommand() {
   const pluginRoot = resolvePluginRoot();
   const manifest = readPluginManifest(pluginRoot);
   if (!manifest) {
-    throw new AxiError("No plugin.json found in the lavish-axi package", "SERVER_ERROR", [
+    throw new AxiError("No plugin.json found in the acrylaxi package", "SERVER_ERROR", [
       `Expected a manifest at ${path.join(pluginRoot, "plugin.json")}`,
-      "Reinstall lavish-axi, or run `npm run build:plugin` when working from a source checkout",
+      "Reinstall acrylaxi, or run `npm run build:plugin` when working from a source checkout",
     ]);
   }
 
@@ -1422,7 +1420,7 @@ async function setupPluginCommand() {
 
   const help = ["Restart or reload each client so it discovers the plugin"];
   if (clients.some((client) => client.status === "absent")) {
-    help.push("Absent clients are skipped; re-run `lavish-axi setup plugin` after installing one");
+    help.push("Absent clients are skipped; re-run `acrylaxi setup plugin` after installing one");
   }
   if (clients.some((client) => client.status === "manual")) {
     help.push(`Register the plugin root manually where noted: ${pluginRoot}`);
@@ -1626,7 +1624,7 @@ export function resolveCopilotHookDir(env = process.env, homeDir = resolveHookHo
   return path.join(env.COPILOT_HOME || path.join(homeDir, ".copilot"), "hooks");
 }
 
-export function createCopilotCliAmbientContextScript(command = "lavish-axi") {
+export function createCopilotCliAmbientContextScript(command = "acrylaxi") {
   return [
     'const { spawnSync } = require("node:child_process");',
     `const command = ${JSON.stringify(command)};`,
@@ -1634,12 +1632,12 @@ export function createCopilotCliAmbientContextScript(command = "lavish-axi") {
     'const detail = result.error ? result.error.message : (result.stderr || result.stdout || "exit " + (result.status ?? "unknown"));',
     "const text = String(result.status === 0 ? result.stdout : detail).trim();",
     'if (!text) { console.log("{}"); process.exit(0); }',
-    'const prefix = result.status === 0 ? "## AXI ambient context: lavish-axi\\n" : "## AXI ambient context: lavish-axi\\nerror: lavish-axi ambient context failed: ";',
+    'const prefix = result.status === 0 ? "## AXI ambient context: acrylaxi\\n" : "## AXI ambient context: acrylaxi\\nerror: acrylaxi ambient context failed: ";',
     "console.log(JSON.stringify({ additionalContext: prefix + text }));",
   ].join(" ");
 }
 
-export function createCopilotCliSessionStartHook(command = "lavish-axi", timeoutSec = 10) {
+export function createCopilotCliSessionStartHook(command = "acrylaxi", timeoutSec = 10) {
   const script = createCopilotCliAmbientContextScript(command);
   return {
     type: "command",
@@ -1676,11 +1674,11 @@ export function computeCopilotCliHookUpdate(settings, hook = createCopilotCliSes
 
 export function installCopilotCliSessionStartHook({
   hookDir = resolveCopilotHookDir(),
-  command = "lavish-axi",
+  command = "acrylaxi",
   timeoutSec = 10,
   onError = undefined,
 } = {}) {
-  const target = path.join(hookDir, "lavish-axi.json");
+  const target = path.join(hookDir, "acrylaxi.json");
   try {
     mkdirSync(path.dirname(target), { recursive: true });
     const current = existsSync(target) ? JSON.parse(readFileSync(target, "utf8")) : {};
@@ -1703,7 +1701,7 @@ function isManagedCopilotCliHook(entry) {
     typeof entry === "object" &&
     (typeof entry.bash === "string" || typeof entry.powershell === "string" || typeof entry.command === "string") &&
     [entry.bash, entry.powershell, entry.command].some(
-      (value) => typeof value === "string" && value.includes("lavish-axi"),
+      (value) => typeof value === "string" && value.includes("acrylaxi"),
     )
   );
 }
@@ -1722,7 +1720,7 @@ function deepEqual(a, b) {
 
 async function serverCommand(args) {
   const port = Number(flagValue(args, "--port") || defaultPort());
-  const debug = args.includes("--verbose") || process.env.LAVISH_AXI_DEBUG === "1";
+  const debug = args.includes("--verbose") || process.env.ACRYLAXI_DEBUG === "1";
   const server = await serve({
     port,
     stateFile: stateFile(),
@@ -1750,13 +1748,13 @@ async function visibleSessions() {
 
 async function assertHtmlFile(file) {
   if (!isHtmlPath(file)) {
-    throw new AxiError("Lavish Editor expects an HTML file", "VALIDATION_ERROR", ["Run `lavish-axi <html-file>`"]);
+    throw new AxiError("Acrylaxi expects an HTML file", "VALIDATION_ERROR", ["Run `acrylaxi <html-file>`"]);
   }
   try {
     await access(file);
   } catch {
     throw new AxiError(`File not found: ${file}`, "NOT_FOUND", [
-      "Create the HTML artifact first, then run `lavish-axi <html-file>`",
+      "Create the HTML artifact first, then run `acrylaxi <html-file>`",
     ]);
   }
 }
@@ -1768,8 +1766,8 @@ const MAX_HEALTH_BODY_BYTES = 256 * 1024;
 // answering, which can take longer than a plain health read.
 const HEALTH_RECONCILE_TIMEOUT_MS = 3000;
 
-// The addresses a Lavish server on this port could be answering at: the host this CLI is
-// configured for and loopback. Agents on one machine do not share LAVISH_AXI_HOST, so loopback is
+// The addresses an Acrylaxi server on this port could be answering at: the host this CLI is
+// configured for and loopback. Agents on one machine do not share ACRYLAXI_HOST, so loopback is
 // the meeting point - every server binds it first as the port lock. See `discoveryHosts` for the
 // opt-in sweep that also finds a pre-0.1.78 server pinned to another address alone.
 function serverCandidateHosts() {
@@ -1785,26 +1783,26 @@ function serverBaseUrl(host, port) {
 // its configured host or loopback - where replacing it is the upgrade path; anywhere else it may
 // belong to another installation and is never adopted or stopped.
 function isOwnedServer(entry, controlHosts) {
-  if (entry.health.app !== "lavish-axi") return false;
+  if (entry.health.app !== "acrylaxi") return false;
   if (typeof entry.health.state_id === "string") return entry.health.state_id === stateId();
   return controlHosts.has(entry.host);
 }
 
-// Another installation's Lavish server at an address this CLI controls is never used, replaced, or
+// Another installation's Acrylaxi server at an address this CLI controls is never used, replaced, or
 // stopped: its sessions and state file are not ours.
 function otherInstallationError(port, foreign) {
   const dir = typeof foreign.health.state_dir === "string" ? foreign.health.state_dir : "an unknown state directory";
   return new AxiError(
-    `Port ${port} is served by another Lavish installation at ${foreign.host} (state directory ${dir})`,
+    `Port ${port} is served by another Acrylaxi installation at ${foreign.host} (state directory ${dir})`,
     "SERVER_ERROR",
-    [`Set LAVISH_AXI_PORT to another port, or set LAVISH_AXI_STATE_DIR to ${dir} to use that installation`],
+    [`Set ACRYLAXI_PORT to another port, or set ACRYLAXI_STATE_DIR to ${dir} to use that installation`],
   );
 }
 
-// Returns where a Lavish server actually answered, plus any OTHER Lavish daemon of this
+// Returns where an Acrylaxi server actually answered, plus any OTHER Acrylaxi daemon of this
 // installation found on the same port at an address the chosen one does not serve. Every candidate
 // is probed in parallel and each probe is bounded, so a hanging or foreign address cannot mask
-// loopback, and a response whose app is lavish-axi wins over a foreign /health. When nothing
+// loopback, and a response whose app is acrylaxi wins over a foreign /health. When nothing
 // answers, the primary URL is still returned so callers have something to spawn against and report.
 async function findRunningServer(port, { reconcileNetwork = false } = {}) {
   const controlHosts = new Set([clientHost(), LOOPBACK_HOST]);
@@ -1819,8 +1817,7 @@ async function findRunningServer(port, { reconcileNetwork = false } = {}) {
   const owned = found.filter((entry) => isOwnedServer(entry, controlHosts));
   const foreign =
     found.find(
-      (entry) =>
-        controlHosts.has(entry.host) && entry.health.app === "lavish-axi" && !isOwnedServer(entry, controlHosts),
+      (entry) => controlHosts.has(entry.host) && entry.health.app === "acrylaxi" && !isOwnedServer(entry, controlHosts),
     ) ?? null;
   const chosen = owned[0];
   if (!chosen) {
@@ -1837,7 +1834,7 @@ async function findRunningServer(port, { reconcileNetwork = false } = {}) {
   return { baseUrl: chosen.baseUrl, health, duplicates: ownedDuplicates(owned, chosen), foreign };
 }
 
-// Other Lavish daemons of this installation on the same port. An address the chosen server itself
+// Other Acrylaxi daemons of this installation on the same port. An address the chosen server itself
 // reports as bound, or a matching process identity through a proxy, is not a duplicate. A server
 // too old to report its addresses is about to be replaced by version, so every other address is
 // retired with it: an old daemon left holding loopback would otherwise make the upgraded server
@@ -1861,7 +1858,7 @@ function ownedDuplicates(owned, chosen) {
 }
 
 // Duplicates are retired over their own /shutdown, never by process name or port-wide signal, so
-// nothing but an identified Lavish server of this installation is ever stopped.
+// nothing but an identified Acrylaxi server of this installation is ever stopped.
 async function stopDuplicateServers(duplicates, { reloadKey = "", reason = "" } = {}) {
   for (const duplicate of duplicates) {
     await requestShutdown(duplicate.baseUrl, {
@@ -1882,12 +1879,12 @@ async function adoptServer(baseUrl, duplicates, reloadKey) {
   return baseUrl;
 }
 
-// The concrete addresses this CLI's own LAVISH_AXI_HOST needs a server to serve. Without an explicit
+// The concrete addresses this CLI's own ACRYLAXI_HOST needs a server to serve. Without an explicit
 // host any running server will do: loopback is always served, and Tailscale is the server's to
 // detect. A name that does not resolve right now is still required as the name, so the server is
 // asked to serve it, retries it, and reports it as network_warning instead of it being dropped.
 async function requiredServerHosts(env = process.env) {
-  const envHost = env.LAVISH_AXI_HOST?.trim();
+  const envHost = env.ACRYLAXI_HOST?.trim();
   if (!envHost || isWildcardHost(envHost)) return [];
   return resolveConcreteListenHosts([clientHost(env)], { keepUnresolved: true });
 }
@@ -1947,16 +1944,16 @@ async function ensureServer({ forceRestart = false, reloadKey = "" } = {}) {
   const { baseUrl, health: existing, duplicates, foreign } = await findRunningServer(port, { reconcileNetwork: true });
   if (foreign) throw otherInstallationError(port, foreign);
   const missingHosts =
-    existing?.app === "lavish-axi" ? missingServerHosts(existing, hostsToServe(requiredHosts, duplicates)) : [];
+    existing?.app === "acrylaxi" ? missingServerHosts(existing, hostsToServe(requiredHosts, duplicates)) : [];
   if (existing && !shouldRestartServer(VERSION, existing, forceRestart) && missingHosts.length === 0) {
     return adoptServer(baseUrl, duplicates, reloadKey);
   }
   let alsoListen = inheritedListenHosts([existing, ...duplicates.map((duplicate) => duplicate.health)], requiredHosts);
   let unidentified = "";
   if (existing) {
-    if (!(await canControlServerOnPort(baseUrl, existing, listenerMatchesLavish))) {
-      throw new AxiError(`Port ${port} is occupied by a non-Lavish server`, "SERVER_ERROR", [
-        `Stop the process using port ${port}, or set LAVISH_AXI_PORT to another port`,
+    if (!(await canControlServerOnPort(baseUrl, existing, listenerMatchesAcrylaxi))) {
+      throw new AxiError(`Port ${port} is occupied by a non-Acrylaxi server`, "SERVER_ERROR", [
+        `Stop the process using port ${port}, or set ACRYLAXI_PORT to another port`,
       ]);
     }
     await stopDuplicateServers(duplicates, { reloadKey });
@@ -1969,7 +1966,7 @@ async function ensureServer({ forceRestart = false, reloadKey = "" } = {}) {
       // so the POST 404'd. Fall back to SIGTERM by PID so the very first upgrade still
       // works, then keep waiting.
       if (shouldKillProcessOnPort(VERSION, existing)) {
-        if (killLavishListener(baseUrl)) await waitForPortFree(baseUrl, 3000);
+        if (killAcrylaxiListener(baseUrl)) await waitForPortFree(baseUrl, 3000);
         else unidentified = baseUrl;
       }
     }
@@ -1977,7 +1974,7 @@ async function ensureServer({ forceRestart = false, reloadKey = "" } = {}) {
   await startServer(port, { alsoListen });
   const replacedForNetwork =
     Boolean(existing) &&
-    existing.app === "lavish-axi" &&
+    existing.app === "acrylaxi" &&
     existing.network_stale === true &&
     !forceRestart &&
     typeof existing.version === "string" &&
@@ -1994,17 +1991,17 @@ async function ensureServer({ forceRestart = false, reloadKey = "" } = {}) {
     } = await findRunningServer(port, { reconcileNetwork: true });
     if (liveForeign) throw otherInstallationError(port, liveForeign);
     const liveMissing =
-      health?.app === "lavish-axi" ? missingServerHosts(health, hostsToServe(requiredHosts, liveDuplicates)) : [];
+      health?.app === "acrylaxi" ? missingServerHosts(health, hostsToServe(requiredHosts, liveDuplicates)) : [];
     // Once is the bound: every replacement carries the hosts of the server it replaces, so two CLIs
     // that each need their own address converge on one server instead of replacing each other.
     if (health && !shouldRestartServer(VERSION, health)) {
       if (liveMissing.length === 0) return adoptServer(liveUrl, liveDuplicates, reloadKey);
       if (raceRestarted) throw missingHostsError(port, liveMissing);
     }
-    // Another daemon won the port while ours was starting (ours exits when a Lavish server already
+    // Another daemon won the port while ours was starting (ours exits when an Acrylaxi server already
     // owns loopback) - an older release, or one missing an address this CLI needs. Retire it and
     // start once more rather than wait it out.
-    if (health?.app === "lavish-axi" && health.network_stale !== true && !raceRestarted) {
+    if (health?.app === "acrylaxi" && health.network_stale !== true && !raceRestarted) {
       raceRestarted = true;
       alsoListen = inheritedListenHosts(
         [health, ...liveDuplicates.map((duplicate) => duplicate.health)],
@@ -2018,7 +2015,7 @@ async function ensureServer({ forceRestart = false, reloadKey = "" } = {}) {
       deadline = Date.now() + 5000;
       continue;
     }
-    if (health?.network_stale === true && health.app === "lavish-axi") {
+    if (health?.network_stale === true && health.app === "acrylaxi") {
       if (networkRestarted) {
         if (liveMissing.length > 0) throw missingHostsError(port, liveMissing);
         return adoptServer(liveUrl, liveDuplicates, reloadKey);
@@ -2034,16 +2031,16 @@ async function ensureServer({ forceRestart = false, reloadKey = "" } = {}) {
     await delay(100);
   }
   if (unidentified) throw unidentifiedListenerError(unidentified);
-  throw new AxiError("Lavish Editor server did not start", "SERVER_ERROR", [
-    `Run \`lavish-axi server --port ${port}\` to inspect server startup`,
+  throw new AxiError("Acrylaxi server did not start", "SERVER_ERROR", [
+    `Run \`acrylaxi server --port ${port}\` to inspect server startup`,
   ]);
 }
 
 function missingHostsError(port, missingHosts) {
   return new AxiError(
-    `The Lavish server on port ${port} does not serve ${missingHosts.join(", ")}, and replacing it did not stick`,
+    `The Acrylaxi server on port ${port} does not serve ${missingHosts.join(", ")}, and replacing it did not stick`,
     "SERVER_ERROR",
-    ["Run `lavish-axi stop`, then retry"],
+    ["Run `acrylaxi stop`, then retry"],
   );
 }
 
@@ -2053,8 +2050,8 @@ function missingHostsError(port, missingHosts) {
 // to step aside.
 export function shouldRestartServer(currentVersion, healthBody, forceRestart = false) {
   if (!healthBody || typeof healthBody !== "object") return false;
-  if (forceRestart && healthBody.app === "lavish-axi") return true;
-  if (healthBody.network_stale === true && healthBody.app === "lavish-axi") return true;
+  if (forceRestart && healthBody.app === "acrylaxi") return true;
+  if (healthBody.network_stale === true && healthBody.app === "acrylaxi") return true;
   if (typeof healthBody.version !== "string" || healthBody.version === "") return true;
   return isServerOlderThanCli(currentVersion, healthBody.version);
 }
@@ -2106,15 +2103,15 @@ function localSourceServerExists() {
 export function shouldKillProcessOnPort(currentVersion, healthBody) {
   if (!healthBody || typeof healthBody !== "object") return false;
   if (typeof healthBody.version !== "string" || healthBody.version === "") return true;
-  if (healthBody.app !== "lavish-axi") return false;
+  if (healthBody.app !== "acrylaxi") return false;
   return isServerOlderThanCli(currentVersion, healthBody.version);
 }
 
-async function canControlServerOnPort(baseUrl, healthBody, processMatchesLavish) {
+async function canControlServerOnPort(baseUrl, healthBody, processMatchesAcrylaxi) {
   if (!healthBody || typeof healthBody !== "object") return false;
-  if (healthBody.app === "lavish-axi") return true;
+  if (healthBody.app === "acrylaxi") return true;
   if (typeof healthBody.version === "string" && healthBody.version !== "") return false;
-  return processMatchesLavish(baseUrl);
+  return processMatchesAcrylaxi(baseUrl);
 }
 
 /**
@@ -2194,10 +2191,10 @@ async function waitForPortFree(baseUrl, timeoutMs) {
   return false;
 }
 
-// PIDs listening on exactly this server's address and port whose command is Lavish. Other
+// PIDs listening on exactly this server's address and port whose command is Acrylaxi. Other
 // processes can share the port at other addresses, so nothing is identified by port alone.
-// macOS/Linux only (lsof) - lavish-axi isn't shipped for Windows today.
-function lavishListenerPids(baseUrl) {
+// macOS/Linux only (lsof) - acrylaxi isn't shipped for Windows today.
+function acrylaxiListenerPids(baseUrl) {
   const { hostname, port } = new URL(baseUrl);
   try {
     const listing = spawnSync("lsof", ["-t", `-iTCP@${hostname}:${port}`, "-sTCP:LISTEN"], { encoding: "utf8" });
@@ -2207,7 +2204,7 @@ function lavishListenerPids(baseUrl) {
       const pid = Number(line.trim());
       if (!Number.isInteger(pid) || pid <= 0 || pid === process.pid) continue;
       const command = spawnSync("ps", ["-p", String(pid), "-o", "command="], { encoding: "utf8" });
-      if (command.status === 0 && /lavish-axi/.test(command.stdout)) pids.push(pid);
+      if (command.status === 0 && /acrylaxi/.test(command.stdout)) pids.push(pid);
     }
     return pids;
   } catch {
@@ -2215,15 +2212,15 @@ function lavishListenerPids(baseUrl) {
   }
 }
 
-function listenerMatchesLavish(baseUrl) {
-  return lavishListenerPids(baseUrl).length > 0;
+function listenerMatchesAcrylaxi(baseUrl) {
+  return acrylaxiListenerPids(baseUrl).length > 0;
 }
 
 // Last-resort fallback for the bootstrap upgrade case: a pre-handshake server is squatting on the
-// port and doesn't expose /shutdown, so its PID is resolved and SIGTERM'd. Reports whether a Lavish
+// port and doesn't expose /shutdown, so its PID is resolved and SIGTERM'd. Reports whether an Acrylaxi
 // process was found to signal.
-function killLavishListener(baseUrl) {
-  const pids = lavishListenerPids(baseUrl);
+function killAcrylaxiListener(baseUrl) {
+  const pids = acrylaxiListenerPids(baseUrl);
   for (const pid of pids) {
     try {
       process.kill(pid, "SIGTERM");
@@ -2237,9 +2234,9 @@ function killLavishListener(baseUrl) {
 function unidentifiedListenerError(baseUrl) {
   const { host } = new URL(baseUrl);
   return new AxiError(
-    `The server at ${host} did not shut down, and no Lavish process listening there could be identified`,
+    `The server at ${host} did not shut down, and no Acrylaxi process listening there could be identified`,
     "SERVER_ERROR",
-    [`Stop the process listening on ${host} yourself, or set LAVISH_AXI_PORT to another port`],
+    [`Stop the process listening on ${host} yourself, or set ACRYLAXI_PORT to another port`],
   );
 }
 
@@ -2263,11 +2260,11 @@ async function startServer(port, { alsoListen = [] } = {}) {
 }
 
 // The detached server child must stamp stdio before evaluating the CLI. In source layout that
-// is `../bin/lavish-axi-server.js`. In the published bundle only `dist/` ships, so the sibling
-// `server.mjs` bootstrap is the entry. Ordinary user-facing commands still use `bin/lavish-axi.js`
+// is `../bin/acrylaxi-server.js`. In the published bundle only `dist/` ships, so the sibling
+// `server.mjs` bootstrap is the entry. Ordinary user-facing commands still use `bin/acrylaxi.js`
 // / `dist/cli.mjs`.
 function resolveServerEntry() {
-  const sourceEntry = fileURLToPath(new URL("../bin/lavish-axi-server.js", import.meta.url));
+  const sourceEntry = fileURLToPath(new URL("../bin/acrylaxi-server.js", import.meta.url));
   if (existsSync(sourceEntry)) return sourceEntry;
   return fileURLToPath(new URL("./server.mjs", import.meta.url));
 }
@@ -2282,14 +2279,14 @@ export function createServerSpawnOptions(logFd = null) {
   );
   // The server is shared machine-wide, so it must not pin the first caller's folder: tools that
   // reap processes by working directory when deleting a worktree would stop every open session.
-  // The state dir is passed absolute so a relative LAVISH_AXI_STATE_DIR is not re-resolved
+  // The state dir is passed absolute so a relative ACRYLAXI_STATE_DIR is not re-resolved
   // against that new cwd.
   const dir = path.resolve(stateDir());
   return {
     detached: true,
     stdio,
     cwd: dir,
-    env: { ...process.env, LAVISH_AXI_STATE_DIR: dir, LAVISH_AXI_NO_OPEN: "1" },
+    env: { ...process.env, ACRYLAXI_STATE_DIR: dir, ACRYLAXI_NO_OPEN: "1" },
   };
 }
 
@@ -2332,14 +2329,14 @@ export async function fetchJson(
           ? ` (current listener: ${holder.label}; active for ${Math.max(0, holder.age_ms)}ms)`
           : "";
       const error = new AxiError(
-        `${payload.error || `Lavish Editor request failed: ${response.status}`}${holderDetail}`,
+        `${payload.error || `Acrylaxi request failed: ${response.status}`}${holderDetail}`,
         payload.code,
         ["Use --takeover only when you intend to displace the current listener"],
       );
       if (holder) Object.assign(error, { holder });
       throw error;
     }
-    throw new AxiError(`Lavish Editor request failed: ${response.status}`, "SERVER_ERROR");
+    throw new AxiError(`Acrylaxi request failed: ${response.status}`, "SERVER_ERROR");
   }
   onResponse?.(response);
   try {
@@ -2361,7 +2358,7 @@ async function postJson(url, body) {
     throw serverConnectionError();
   }
   if (!response.ok) {
-    throw new AxiError(`Lavish Editor request failed: ${response.status}`, "SERVER_ERROR");
+    throw new AxiError(`Acrylaxi request failed: ${response.status}`, "SERVER_ERROR");
   }
   return response.json();
 }
@@ -2386,9 +2383,9 @@ export async function postAgentReply(url, text, file, { timeoutMs = AGENT_REPLY_
     });
   } catch {
     if (signal.aborted) throw agentReplyReceiptTimeoutError(file, timeoutMs);
-    throw new AxiError("Lavish Editor server connection failed", "SERVER_ERROR", [
-      "Run `lavish-axi server --verbose` or inspect `~/.lavish-axi/server.log` (`LAVISH_AXI_STATE_DIR/server.log` when set) for server startup or crash diagnostics",
-      `Re-run \`lavish-axi reply ${file} --agent-reply "<message>"\` after the server is reachable`,
+    throw new AxiError("Acrylaxi server connection failed", "SERVER_ERROR", [
+      "Run `acrylaxi server --verbose` or inspect `~/.acrylaxi/server.log` (`ACRYLAXI_STATE_DIR/server.log` when set) for server startup or crash diagnostics",
+      `Re-run \`acrylaxi reply ${file} --agent-reply "<message>"\` after the server is reachable`,
     ]);
   }
   let payload = null;
@@ -2398,18 +2395,16 @@ export async function postAgentReply(url, text, file, { timeoutMs = AGENT_REPLY_
     if (signal.aborted) throw agentReplyReceiptTimeoutError(file, timeoutMs);
   }
   if (response.status === 404) {
-    throw new AxiError("No active Lavish Editor session for this file", "NOT_FOUND", [
-      `Run \`lavish-axi ${file}\` first`,
-    ]);
+    throw new AxiError("No active Acrylaxi session for this file", "NOT_FOUND", [`Run \`acrylaxi ${file}\` first`]);
   }
   if (response.status === 409 && payload?.status === "ended") {
-    throw new AxiError("Lavish Editor session has ended; reply was not sent", "SESSION_ENDED", [
+    throw new AxiError("Acrylaxi session has ended; reply was not sent", "SESSION_ENDED", [
       createEndedNextStep(file, payload.ended_by),
     ]);
   }
   if (!response.ok || payload?.status !== "sent") {
-    throw new AxiError(`Lavish Editor did not accept the agent reply (${response.status})`, "SERVER_ERROR", [
-      `Confirm the session is open with \`lavish-axi ${file}\`, then re-run \`lavish-axi reply ${file}\``,
+    throw new AxiError(`Acrylaxi did not accept the agent reply (${response.status})`, "SERVER_ERROR", [
+      `Confirm the session is open with \`acrylaxi ${file}\`, then re-run \`acrylaxi reply ${file}\``,
     ]);
   }
   return payload;
@@ -2417,26 +2412,26 @@ export async function postAgentReply(url, text, file, { timeoutMs = AGENT_REPLY_
 
 function agentReplyReceiptTimeoutError(file, timeoutMs) {
   return new AxiError(
-    `Lavish Editor did not confirm the agent reply within ${timeoutMs}ms, so acceptance is unknown`,
+    `Acrylaxi did not confirm the agent reply within ${timeoutMs}ms, so acceptance is unknown`,
     "SERVER_ERROR",
     [
-      "Run `lavish-axi server --verbose` or inspect `~/.lavish-axi/server.log` (`LAVISH_AXI_STATE_DIR/server.log` when set) for server diagnostics",
-      `Check the Lavish Editor conversation for the reply before re-running \`lavish-axi reply ${file}\`, so it is not posted twice`,
+      "Run `acrylaxi server --verbose` or inspect `~/.acrylaxi/server.log` (`ACRYLAXI_STATE_DIR/server.log` when set) for server diagnostics",
+      `Check the Acrylaxi conversation for the reply before re-running \`acrylaxi reply ${file}\`, so it is not posted twice`,
     ],
   );
 }
 
 function serverConnectionError() {
-  return new AxiError("Lavish Editor server connection failed", "SERVER_ERROR", [
-    "Run `lavish-axi server --verbose` or inspect `~/.lavish-axi/server.log` (`LAVISH_AXI_STATE_DIR/server.log` when set) for server startup or crash diagnostics",
-    "Re-run the last `lavish-axi poll <html-file>` command after the server is healthy",
+  return new AxiError("Acrylaxi server connection failed", "SERVER_ERROR", [
+    "Run `acrylaxi server --verbose` or inspect `~/.acrylaxi/server.log` (`ACRYLAXI_STATE_DIR/server.log` when set) for server startup or crash diagnostics",
+    "Re-run the last `acrylaxi poll <html-file>` command after the server is healthy",
   ]);
 }
 
 function pollResponseInterruptedError() {
-  return new AxiError("Lavish Editor poll response was interrupted", "SERVER_ERROR", [
-    "Run `lavish-axi server --verbose` or inspect `~/.lavish-axi/server.log` (`LAVISH_AXI_STATE_DIR/server.log` when set) for server startup or crash diagnostics",
-    "Re-run the last `lavish-axi poll <html-file>` command after the server is healthy",
+  return new AxiError("Acrylaxi poll response was interrupted", "SERVER_ERROR", [
+    "Run `acrylaxi server --verbose` or inspect `~/.acrylaxi/server.log` (`ACRYLAXI_STATE_DIR/server.log` when set) for server startup or crash diagnostics",
+    "Re-run the last `acrylaxi poll <html-file>` command after the server is healthy",
   ]);
 }
 
@@ -2638,23 +2633,23 @@ export function getCommandHelp(command, { agent = "generic" } = {}) {
 }
 
 function createTopLevelHelp({ agent = "generic" } = {}) {
-  return `lavish-axi - Lavish Editor AXI\n\nUsage:\n  lavish-axi\n  lavish-axi <html-file> [--no-open] [--no-gate] [--reopen]\n  lavish-axi poll <html-file> [--owner <label>] [--takeover] [--agent-reply "..."] [--agent-reply-file <path>]\n  lavish-axi reply <html-file> (--agent-reply "..." | --agent-reply-file <path>)\n  lavish-axi end <html-file>\n  lavish-axi export <html-file> [--out <path>]\n  lavish-axi share <html-file> [--private | --password <pw>] [--token <t>]\n  lavish-axi share <html-file> --site <site_id> --update-key <key> [--private | --password <pw>]\n  lavish-axi share --unpublish --site <site_id> --update-key <key>\n  lavish-axi stop\n  lavish-axi playbook [playbook_id]\n  lavish-axi design\n  lavish-axi libraries [--search <text>] [--library <id>]\n  lavish-axi setup hooks\n  lavish-axi setup plugin\n\n${DESIGN_SYSTEM_HINT}\n\nNote: poll long-polls until the user sends feedback, ends the session, or leaves every review window disconnected past the reconnect grace period, staying silent while it waits - never kill it. Layout issues the browser detects are passive: they collect in the user's Layout issues inbox in the Lavish top bar and reach the agent only when the user selects them and queues the fixes, as an ordinary tag "layout-warnings" prompt. Do not pass --timeout-ms during normal agent use; it is for tests and debugging only. ${pollExecutionGuidance({ agent })} ${POLL_SEND_AND_END_RULE} Use \`lavish-axi reply\` when handing a result back without waiting for more feedback: it exits 0 only after the server accepts the reply, so the board stops showing Working. \`poll --agent-reply\` posts a reply and then keeps waiting.\n\n`;
+  return `acrylaxi - ACRYL AXI\n\nUsage:\n  acrylaxi\n  acrylaxi <html-file> [--no-open] [--no-gate] [--reopen]\n  acrylaxi poll <html-file> [--owner <label>] [--takeover] [--agent-reply "..."] [--agent-reply-file <path>]\n  acrylaxi reply <html-file> (--agent-reply "..." | --agent-reply-file <path>)\n  acrylaxi end <html-file>\n  acrylaxi export <html-file> [--out <path>]\n  acrylaxi share <html-file> [--private | --password <pw>] [--token <t>]\n  acrylaxi share <html-file> --site <site_id> --update-key <key> [--private | --password <pw>]\n  acrylaxi share --unpublish --site <site_id> --update-key <key>\n  acrylaxi stop\n  acrylaxi playbook [playbook_id]\n  acrylaxi design\n  acrylaxi libraries [--search <text>] [--library <id>]\n  acrylaxi setup hooks\n  acrylaxi setup plugin\n\n${DESIGN_SYSTEM_HINT}\n\nNote: poll long-polls until the user sends feedback, ends the session, or leaves every review window disconnected past the reconnect grace period, staying silent while it waits - never kill it. Layout issues the browser detects are passive: they collect in the user's Layout issues inbox in the Acrylaxi top bar and reach the agent only when the user selects them and queues the fixes, as an ordinary tag "layout-warnings" prompt. Do not pass --timeout-ms during normal agent use; it is for tests and debugging only. ${pollExecutionGuidance({ agent })} ${POLL_SEND_AND_END_RULE} Use \`acrylaxi reply\` when handing a result back without waiting for more feedback: it exits 0 only after the server accepts the reply, so the board stops showing Working. \`poll --agent-reply\` posts a reply and then keeps waiting.\n\n`;
 }
 
 function createCommandHelp({ agent = "generic" } = {}) {
   return {
-    open: `Usage: lavish-axi <html-file> [--no-open] [--no-gate] [--reopen]\n\nOpen or resume a Lavish Editor review session for an HTML artifact. Use --no-open when you need to ensure the server/session exists without opening another browser window. Use --no-gate to skip the open-time layout curtain for this browser open. If the user explicitly ended the session from the browser, this refuses to reopen it and returns guidance instead - pass --reopen to force it open when the user asks for further review or something important needs their visual attention. Sessions ended by the agent (\`lavish-axi end\`) reopen normally without the flag.\n`,
-    poll: `Usage: lavish-axi poll <html-file> [--owner <label>] [--takeover] [--agent-reply "..."] [--agent-reply-file <path>]\n\nThis command exclusively long-polls for queued user prompts. Pass --owner <label> to make the active listener visible in session listings; --takeover displaces an existing listener, which receives LISTENER_REPLACED. A second poll without --takeover fails with LISTENER_ACTIVE instead of silently returning waiting.\n\nThis command long-polls indefinitely for queued user prompts. It stays silent while it waits - that is normal, never kill it. Browser-detected layout issues do NOT return this poll: they are filed passively in the user's Layout issues inbox and arrive as an ordinary tag "layout-warnings" prompt only after the user selects them and queues the fixes. Warning lifecycle: an issue stays unresolved and counted while queued, becomes recurring if a newer artifact revision still shows it, and is resolved only after a newer artifact load plus a complete diagnostic pass at the same viewport no longer detects it. A failed or incomplete pass preserves it as unverified rather than clearing it. The only response that arrives without user action is artifact_failures - a fatal failure that made the review surface itself unusable. Do not pass --timeout-ms during normal agent use; it is for tests and debugging only. In a Herdr-managed pane, set LAVISH_AXI_HERDR_CHIME=1 to request attention when the poll has entered its waiting state; unset it or use any other value to keep the current silent behavior. Notification failures never interrupt the poll. ${pollExecutionGuidance({ agent })} Use --agent-reply after applying prior feedback to display a concise response in Lavish Editor before waiting again. When you are handing a result back and are not about to long-poll, run \`lavish-axi reply <html-file> --agent-reply "..."\` instead: that command exits 0 only after the server accepts the reply, so the board stops showing Working without this poll staying open. ${POLL_AGENT_REPLY_RULE} ${POLL_AGENT_REPLY_HELP_POINTER} Do not combine --agent-reply with --agent-reply-file.\n\nExamples:\n  lavish-axi poll report.html --agent-reply "Renamed the payment step."\n  lavish-axi poll report.html --agent-reply-file reply.md\n  lavish-axi poll report.html --agent-reply-file -\n\n${POLL_SEND_AND_END_RULE}\n`,
-    reply: `Usage: lavish-axi reply <html-file> (--agent-reply "..." | --agent-reply-file <path>)\n\nPost an agent reply to the open Lavish Editor session and exit once the server confirms it was accepted. Exit 0 only when the server answers that the reply was sent, which is when the board stops showing Working. If that answer does not arrive within ${AGENT_REPLY_RECEIPT_TIMEOUT_MS / 1000} seconds, exit non-zero with a timeout error. Use this when you are handing a result back and are not about to wait for more feedback. A reply also marks every note the poll delivered to you as Done in the reviewer's panel, so reply once you have handled them.\n\nUse \`lavish-axi poll <html-file> --agent-reply "..."\` instead when the reply should be followed by a long-poll. That command posts the reply and then keeps waiting, so it does not exit when the reply is accepted.\n\nPass exactly one of --agent-reply or --agent-reply-file. ${POLL_AGENT_REPLY_RULE} ${POLL_AGENT_REPLY_HELP_POINTER} Do not combine the two flags. An empty reply is refused.\n\nExamples:\n  lavish-axi reply report.html --agent-reply "Renamed the payment step."\n  lavish-axi reply report.html --agent-reply-file reply.md\n  lavish-axi reply report.html --agent-reply-file -\n`,
-    end: `Usage: lavish-axi end <html-file>\n\nEnd a Lavish Editor session as the agent. A session ended this way still reopens normally on the next \`lavish-axi <html-file>\`, unlike a user ending it from the browser, which requires --reopen.\n`,
-    export: `Usage: lavish-axi export <html-file> [--out <path>]\n\nWrite a portable copy of an artifact: one HTML file with its LOCAL assets inlined (relative-path stylesheets, scripts, images, and fonts become inline <style>/<script> blocks and data URIs). Remote CDN/font references (https URLs) are left as links for the browser to load, so the file needs network to render those. Lavish makes no outbound requests - it only reads local files, confined to the artifact's directory. Defaults to writing <name>.export.html next to the source; pass --out to choose a path. The Lavish annotation SDK is never included in an export.\n`,
-    share: `Usage:\n  lavish-axi share <html-file> [--private | --password <pw>] [--token <t>]\n  lavish-axi share <html-file> --site <site_id> --update-key <key> [--private | --password <pw>]\n  lavish-axi share --unpublish --site <site_id> --update-key <key>\n\nPublish the artifact on ht-ml.app (https://ht-ml.app), a third-party hosting service not part of Lavish, and print a visitable URL. Shares are PUBLIC by default: anyone with the link can open the page, and it may be indexed or scraped. Pass --private to publish a PRIVATE page behind a generated password, returned once in the output - give it to the user with the URL and tell them it is a shared secret. Pass --password <pw> instead when the user chose the password; it is never echoed back. Builds the same local-inlined HTML as 'export' (local assets inlined; remote CDN/font URLs left as links and are not blocked by CSP on ht-ml.app, but still load over the viewer's network), then POSTs it to ht-ml.app's /v1 API. Creating a site needs no account or API key. The response includes the url plus a secret update_key (shown once) for changing the page later.\n\n--site <site_id> with --update-key <key> republishes an existing page in place: same URL, new HTML. On a republish the password is left alone unless you pass --private (rotate to a new generated one) or --password <pw> (set one). There is no way to make a private page public again: ht-ml.app accepts a request to clear a password and silently ignores it, so Lavish does not offer one rather than reporting a page as public while it is still gated. Locking a page that was PUBLIC is also not instant at ht-ml.app's CDN: it was observed still answering uncredentialed requests for minutes after the password was set, so do not tell the user a newly gated page is unreachable right away (a page that was already private has no such cached copy).\n\n--unpublish takes the same credentials and no file. ht-ml.app has NO delete endpoint, so this replaces the page with a short placeholder and locks it behind a random password that is immediately discarded; the URL still resolves and the host still holds what was published. Say that to the user rather than calling it deleted. The update_key still works, so republishing with --private brings the page back behind a new password.\n\nA value flag given an empty or whitespace-only value is REFUSED rather than acted on: an unquoted shell variable that is unset makes \`--password $PW\` an empty password, which the host treats as none and would publish a PUBLIC page while you believed it was gated. Quote the value, or pass --private to have Lavish generate one.\n\nSet LAVISH_AXI_HTML_APP_TOKEN (or pass --token) to attach an optional bearer token when CREATING a page; it is never required. A republish (--site/--update-key) or --unpublish rejects --token, because the update_key is what the Authorization header carries there. The annotation SDK is never included.\n`,
-    stop: `Usage: lavish-axi stop [--port <port>]\n\nShut down the background Lavish Editor server. The server also stops itself when no browser or poll has been connected for a while (LAVISH_AXI_IDLE_TIMEOUT_MS, default 30m) and immediately when the last session ends with nothing connected.\n`,
-    playbook: `Usage: lavish-axi playbook [playbook_id]\n\nList focused artifact guidance playbooks, or show one playbook by ID. Known IDs: diagram, table, comparison, plan, code, input, explanation, slides.\n\n${PLAYBOOK_ROUTER_HELP}\n\nExamples:\n  lavish-axi playbook\n  lavish-axi playbook diagram\n  lavish-axi playbook input\n`,
-    libraries: `Usage: lavish-axi libraries [--search <text>] [--library <id>]\n\nList the Excalidraw libraries (.excalidrawlib files) the user copied into ~/.lavish-axi/excalidraw-libraries, or LAVISH_AXI_STATE_DIR/excalidraw-libraries when set. Their items appear in every whiteboard's library panel. --search lists item refs whose ref contains every search word; --library lists one library's item refs. Lavish only reads this directory and never downloads libraries.\n\nExamples:\n  lavish-axi libraries\n  lavish-axi libraries --search lambda\n  lavish-axi libraries --library aws-architecture-icons\n`,
-    design: `Usage: lavish-axi design\n\nShow a copy-pasteable CDN snippet for Tailwind CSS browser runtime v4 + DaisyUI v5 + themes, the whiteboard (Mermaid) opt-in snippet, a content-to-playbook router, an optional layout safety CSS snippet, plus technical reference for DaisyUI components. ${PLAYBOOK_ROUTER_HELP} Lavish artifacts stay portable HTML. This CDN snippet is the design fallback, not the default: inspect the subject project before falling back, and paste the layout safety CSS only when useful for dense nested grid/flex layouts, badges, wide fonts, or local media. ${DESIGN_PRIORITY_RULE}\n`,
-    setup: `Usage: lavish-axi setup hooks\n       lavish-axi setup plugin\n\nhooks: install or repair agent SessionStart hooks for lavish-axi ambient context in Claude Code, Codex, OpenCode, and GitHub Copilot CLI. Restart your agent session afterward to receive the context. This is the primary integration - it carries live session state.\n\nplugin: register the installed lavish-axi package as an Agent Plugin (agent-plugins.org) in VS Code, Cursor, and GitHub Copilot CLI. The installed package directory is itself the plugin root, so nothing is downloaded and no marketplace is involved. Reload each client afterward. Codex users should use \`setup hooks\` instead.\n\nBoth actions are explicit opt-in, idempotent, and repair a stale path after a reinstall.\n`,
-    server: `Usage: lavish-axi server [--port 4387] [--verbose] [--also-listen <host>...]\n\nRun the local Lavish Editor server. Pass --verbose (or set LAVISH_AXI_DEBUG=1) to log session and watcher events to stderr. Detached server output is appended to ~/.lavish-axi/server.log, or LAVISH_AXI_STATE_DIR/server.log when set, for startup and crash diagnostics.\n\nBy default Lavish binds to 127.0.0.1 and, when Tailscale is running, this machine's Tailscale IPv4. Any explicit LAVISH_AXI_HOST overrides automatic Tailscale binding; wildcard values such as 0.0.0.0 or :: are restricted to loopback. An explicit non-wildcard LAVISH_AXI_HOST sets the bind address, and the server also listens on 127.0.0.1 so every local CLI finds it; --also-listen adds further concrete addresses (the CLI passes it when it replaces a server, to keep every address the old one served). An address that cannot be bound is retried in the background and reported as network_warning. Binding beyond loopback exposes an unauthenticated server that can read and serve arbitrary local files to anything that can reach it, so only do so on a trusted network. With automatic binding enabled, a successfully bound Tailscale listener uses its MagicDNS name in generated session links; otherwise LAVISH_AXI_LINK_HOST can set the link hostname. See README's Allowed hosts section for session-link origins and Host allowlisting. LAVISH_AXI_NO_OPEN=1 (or --no-open) suppresses the local browser launch.\n`,
+    open: `Usage: acrylaxi <html-file> [--no-open] [--no-gate] [--reopen]\n\nOpen or resume an Acrylaxi review session for an HTML artifact. Use --no-open when you need to ensure the server/session exists without opening another browser window. Use --no-gate to skip the open-time layout curtain for this browser open. If the user explicitly ended the session from the browser, this refuses to reopen it and returns guidance instead - pass --reopen to force it open when the user asks for further review or something important needs their visual attention. Sessions ended by the agent (\`acrylaxi end\`) reopen normally without the flag.\n`,
+    poll: `Usage: acrylaxi poll <html-file> [--owner <label>] [--takeover] [--agent-reply "..."] [--agent-reply-file <path>]\n\nThis command exclusively long-polls for queued user prompts. Pass --owner <label> to make the active listener visible in session listings; --takeover displaces an existing listener, which receives LISTENER_REPLACED. A second poll without --takeover fails with LISTENER_ACTIVE instead of silently returning waiting.\n\nThis command long-polls indefinitely for queued user prompts. It stays silent while it waits - that is normal, never kill it. Browser-detected layout issues do NOT return this poll: they are filed passively in the user's Layout issues inbox and arrive as an ordinary tag "layout-warnings" prompt only after the user selects them and queues the fixes. Warning lifecycle: an issue stays unresolved and counted while queued, becomes recurring if a newer artifact revision still shows it, and is resolved only after a newer artifact load plus a complete diagnostic pass at the same viewport no longer detects it. A failed or incomplete pass preserves it as unverified rather than clearing it. The only response that arrives without user action is artifact_failures - a fatal failure that made the review surface itself unusable. Do not pass --timeout-ms during normal agent use; it is for tests and debugging only. In a Herdr-managed pane, set ACRYLAXI_HERDR_CHIME=1 to request attention when the poll has entered its waiting state; unset it or use any other value to keep the current silent behavior. Notification failures never interrupt the poll. ${pollExecutionGuidance({ agent })} Use --agent-reply after applying prior feedback to display a concise response in Acrylaxi before waiting again. When you are handing a result back and are not about to long-poll, run \`acrylaxi reply <html-file> --agent-reply "..."\` instead: that command exits 0 only after the server accepts the reply, so the board stops showing Working without this poll staying open. ${POLL_AGENT_REPLY_RULE} ${POLL_AGENT_REPLY_HELP_POINTER} Do not combine --agent-reply with --agent-reply-file.\n\nExamples:\n  acrylaxi poll report.html --agent-reply "Renamed the payment step."\n  acrylaxi poll report.html --agent-reply-file reply.md\n  acrylaxi poll report.html --agent-reply-file -\n\n${POLL_SEND_AND_END_RULE}\n`,
+    reply: `Usage: acrylaxi reply <html-file> (--agent-reply "..." | --agent-reply-file <path>)\n\nPost an agent reply to the open Acrylaxi session and exit once the server confirms it was accepted. Exit 0 only when the server answers that the reply was sent, which is when the board stops showing Working. If that answer does not arrive within ${AGENT_REPLY_RECEIPT_TIMEOUT_MS / 1000} seconds, exit non-zero with a timeout error. Use this when you are handing a result back and are not about to wait for more feedback. A reply also marks every note the poll delivered to you as Done in the reviewer's panel, so reply once you have handled them.\n\nUse \`acrylaxi poll <html-file> --agent-reply "..."\` instead when the reply should be followed by a long-poll. That command posts the reply and then keeps waiting, so it does not exit when the reply is accepted.\n\nPass exactly one of --agent-reply or --agent-reply-file. ${POLL_AGENT_REPLY_RULE} ${POLL_AGENT_REPLY_HELP_POINTER} Do not combine the two flags. An empty reply is refused.\n\nExamples:\n  acrylaxi reply report.html --agent-reply "Renamed the payment step."\n  acrylaxi reply report.html --agent-reply-file reply.md\n  acrylaxi reply report.html --agent-reply-file -\n`,
+    end: `Usage: acrylaxi end <html-file>\n\nEnd an Acrylaxi session as the agent. A session ended this way still reopens normally on the next \`acrylaxi <html-file>\`, unlike a user ending it from the browser, which requires --reopen.\n`,
+    export: `Usage: acrylaxi export <html-file> [--out <path>]\n\nWrite a portable copy of an artifact: one HTML file with its LOCAL assets inlined (relative-path stylesheets, scripts, images, and fonts become inline <style>/<script> blocks and data URIs). Remote CDN/font references (https URLs) are left as links for the browser to load, so the file needs network to render those. Acrylaxi makes no outbound requests - it only reads local files, confined to the artifact's directory. Defaults to writing <name>.export.html next to the source; pass --out to choose a path. The Acrylaxi annotation SDK is never included in an export.\n`,
+    share: `Usage:\n  acrylaxi share <html-file> [--private | --password <pw>] [--token <t>]\n  acrylaxi share <html-file> --site <site_id> --update-key <key> [--private | --password <pw>]\n  acrylaxi share --unpublish --site <site_id> --update-key <key>\n\nPublish the artifact on ht-ml.app (https://ht-ml.app), a third-party hosting service not part of Acrylaxi, and print a visitable URL. Shares are PUBLIC by default: anyone with the link can open the page, and it may be indexed or scraped. Pass --private to publish a PRIVATE page behind a generated password, returned once in the output - give it to the user with the URL and tell them it is a shared secret. Pass --password <pw> instead when the user chose the password; it is never echoed back. Builds the same local-inlined HTML as 'export' (local assets inlined; remote CDN/font URLs left as links and are not blocked by CSP on ht-ml.app, but still load over the viewer's network), then POSTs it to ht-ml.app's /v1 API. Creating a site needs no account or API key. The response includes the url plus a secret update_key (shown once) for changing the page later.\n\n--site <site_id> with --update-key <key> republishes an existing page in place: same URL, new HTML. On a republish the password is left alone unless you pass --private (rotate to a new generated one) or --password <pw> (set one). There is no way to make a private page public again: ht-ml.app accepts a request to clear a password and silently ignores it, so Acrylaxi does not offer one rather than reporting a page as public while it is still gated. Locking a page that was PUBLIC is also not instant at ht-ml.app's CDN: it was observed still answering uncredentialed requests for minutes after the password was set, so do not tell the user a newly gated page is unreachable right away (a page that was already private has no such cached copy).\n\n--unpublish takes the same credentials and no file. ht-ml.app has NO delete endpoint, so this replaces the page with a short placeholder and locks it behind a random password that is immediately discarded; the URL still resolves and the host still holds what was published. Say that to the user rather than calling it deleted. The update_key still works, so republishing with --private brings the page back behind a new password.\n\nA value flag given an empty or whitespace-only value is REFUSED rather than acted on: an unquoted shell variable that is unset makes \`--password $PW\` an empty password, which the host treats as none and would publish a PUBLIC page while you believed it was gated. Quote the value, or pass --private to have Acrylaxi generate one.\n\nSet ACRYLAXI_HTML_APP_TOKEN (or pass --token) to attach an optional bearer token when CREATING a page; it is never required. A republish (--site/--update-key) or --unpublish rejects --token, because the update_key is what the Authorization header carries there. The annotation SDK is never included.\n`,
+    stop: `Usage: acrylaxi stop [--port <port>]\n\nShut down the background Acrylaxi server. The server also stops itself when no browser or poll has been connected for a while (ACRYLAXI_IDLE_TIMEOUT_MS, default 30m) and immediately when the last session ends with nothing connected.\n`,
+    playbook: `Usage: acrylaxi playbook [playbook_id]\n\nList focused artifact guidance playbooks, or show one playbook by ID. Known IDs: diagram, table, comparison, plan, code, input, explanation, slides.\n\n${PLAYBOOK_ROUTER_HELP}\n\nExamples:\n  acrylaxi playbook\n  acrylaxi playbook diagram\n  acrylaxi playbook input\n`,
+    libraries: `Usage: acrylaxi libraries [--search <text>] [--library <id>]\n\nList the Excalidraw libraries (.excalidrawlib files) the user copied into ~/.acrylaxi/excalidraw-libraries, or ACRYLAXI_STATE_DIR/excalidraw-libraries when set. Their items appear in every whiteboard's library panel. --search lists item refs whose ref contains every search word; --library lists one library's item refs. Acrylaxi only reads this directory and never downloads libraries.\n\nExamples:\n  acrylaxi libraries\n  acrylaxi libraries --search lambda\n  acrylaxi libraries --library aws-architecture-icons\n`,
+    design: `Usage: acrylaxi design\n\nShow a copy-pasteable CDN snippet for Tailwind CSS browser runtime v4 + DaisyUI v5 + themes, the whiteboard (Mermaid) opt-in snippet, a content-to-playbook router, an optional layout safety CSS snippet, plus technical reference for DaisyUI components. ${PLAYBOOK_ROUTER_HELP} Acrylaxi artifacts stay portable HTML. This CDN snippet is the design fallback, not the default: inspect the subject project before falling back, and paste the layout safety CSS only when useful for dense nested grid/flex layouts, badges, wide fonts, or local media. ${DESIGN_PRIORITY_RULE}\n`,
+    setup: `Usage: acrylaxi setup hooks\n       acrylaxi setup plugin\n\nhooks: install or repair agent SessionStart hooks for acrylaxi ambient context in Claude Code, Codex, OpenCode, and GitHub Copilot CLI. Restart your agent session afterward to receive the context. This is the primary integration - it carries live session state.\n\nplugin: register the installed acrylaxi package as an Agent Plugin (agent-plugins.org) in VS Code, Cursor, and GitHub Copilot CLI. The installed package directory is itself the plugin root, so nothing is downloaded and no marketplace is involved. Reload each client afterward. Codex users should use \`setup hooks\` instead.\n\nBoth actions are explicit opt-in, idempotent, and repair a stale path after a reinstall.\n`,
+    server: `Usage: acrylaxi server [--port 4387] [--verbose] [--also-listen <host>...]\n\nRun the local Acrylaxi server. Pass --verbose (or set ACRYLAXI_DEBUG=1) to log session and watcher events to stderr. Detached server output is appended to ~/.acrylaxi/server.log, or ACRYLAXI_STATE_DIR/server.log when set, for startup and crash diagnostics.\n\nBy default Acrylaxi binds to 127.0.0.1 and, when Tailscale is running, this machine's Tailscale IPv4. Any explicit ACRYLAXI_HOST overrides automatic Tailscale binding; wildcard values such as 0.0.0.0 or :: are restricted to loopback. An explicit non-wildcard ACRYLAXI_HOST sets the bind address, and the server also listens on 127.0.0.1 so every local CLI finds it; --also-listen adds further concrete addresses (the CLI passes it when it replaces a server, to keep every address the old one served). An address that cannot be bound is retried in the background and reported as network_warning. Binding beyond loopback exposes an unauthenticated server that can read and serve arbitrary local files to anything that can reach it, so only do so on a trusted network. With automatic binding enabled, a successfully bound Tailscale listener uses its MagicDNS name in generated session links; otherwise ACRYLAXI_LINK_HOST can set the link hostname. See README's Allowed hosts section for session-link origins and Host allowlisting. ACRYLAXI_NO_OPEN=1 (or --no-open) suppresses the local browser launch.\n`,
   };
 }
 

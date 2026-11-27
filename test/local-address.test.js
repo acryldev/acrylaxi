@@ -34,7 +34,7 @@ const SWEEP_INTERFACES = {
 };
 
 test("discovery dials only the configured host and loopback by default", () => {
-  for (const env of [{}, { LAVISH_AXI_DISCOVER_ALL_INTERFACES: "0" }, { LAVISH_AXI_DISCOVER_ALL_INTERFACES: "" }]) {
+  for (const env of [{}, { ACRYLAXI_DISCOVER_ALL_INTERFACES: "0" }, { ACRYLAXI_DISCOVER_ALL_INTERFACES: "" }]) {
     assert.deepEqual(discoveryHosts(["100.64.0.9", "127.0.0.1"], { env, interfaces: SWEEP_INTERFACES }), [
       "100.64.0.9",
       "127.0.0.1",
@@ -49,7 +49,7 @@ test("discovery collapses a configured host that is loopback", () => {
 });
 
 test("the opt-in interface sweep appends every other local address after the control hosts", () => {
-  const env = { LAVISH_AXI_DISCOVER_ALL_INTERFACES: "1" };
+  const env = { ACRYLAXI_DISCOVER_ALL_INTERFACES: "1" };
   assert.deepEqual(discoveryHosts(["100.64.0.9", "127.0.0.1"], { env, interfaces: SWEEP_INTERFACES }), [
     "100.64.0.9",
     "127.0.0.1",

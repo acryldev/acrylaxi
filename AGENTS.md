@@ -2,51 +2,60 @@
 
 This file is loaded every session. It keeps only rules that apply to almost every change. Detail lives in the doc that owns it.
 
+ACRYL AXI is ACRYL's product fork of Lavish Editor (`lavish-axi`) by Kun Chen, renamed and maintained at https://github.com/acryldev/acrylaxi. Upstream is read-only reference: `upstream/` is a submodule that is never edited, built, imported, or tested.
+
 - [README.md](README.md) owns the user-facing contract: features, CLI flags, environment variables, keyboard shortcuts, export and share, and session-end etiquette.
-- CLI output owns what agents are told while using Lavish: `lavish-axi --help`, `lavish-axi design`, and `lavish-axi playbook <id>` (`src/cli.js`, `src/design-reference.js`, `src/playbooks.js`). The generated skill (`src/skill.js` to `skills/lavish/SKILL.md`) stays a stub that points at those commands. Do not copy CLI-owned instructions into the skill.
+- CLI output owns what agents are told while using Acrylaxi: `acrylaxi --help`, `acrylaxi design`, and `acrylaxi playbook <id>` (`src/cli.js`, `src/design-reference.js`, `src/playbooks.js`). The generated skill (`src/skill.js` to `skills/acrylaxi/SKILL.md`) stays a stub that points at those commands. Do not copy CLI-owned instructions into the skill.
 - [VISION.md](VISION.md) owns the acceptance policy. Change it only through the author.
 - [docs/invariants.md](docs/invariants.md) owns architecture internals, security rationale, and easy-to-reintroduce failure modes. Read the section for the area you are editing before changing it.
+- [docs/upstream-reference.md](docs/upstream-reference.md) owns the submodule, the upstream scripts, and the adoption policy.
 - Update the owner when a contract changes. Edit this file only when an every-session rule changes.
 
 ## Commands
 
 ```sh
-pnpm run check          # build, lint, format check, typecheck, tests, and skill freshness
+pnpm run check          # build, lint, format check, typecheck, tests, and generated-file freshness
 pnpm run build          # bundle dist/cli.mjs and copy chrome/design assets into dist
-pnpm run build:skill    # regenerate skills/lavish/SKILL.md from src/skill.js
+pnpm run build:skill    # regenerate skills/acrylaxi/SKILL.md from src/skill.js
+pnpm run build:plugin   # regenerate root plugin.json from package.json
 pnpm test               # node:test runner (test/*.test.js)
 pnpm run lint           # ESLint over bin src test scripts
 pnpm run format:check   # Prettier check
 pnpm run typecheck      # tsc --noEmit (checkJs)
+pnpm run upstream:status # fetch + report pinned vs latest upstream; never modifies the submodule
+pnpm run upstream:pull   # move the submodule pin to upstream main and print what changed
 ```
 
 One file: `node --test test/server.test.js`. One name: `node --test --test-name-pattern "createOpenOutput" test/cli-output.test.js`.
-Opt-in browser suites need `chrome-devtools-axi`: `LAVISH_AXI_BROWSER_E2E=1 node --test test/layout-audit-browser.test.js test/layout-warning-inbox.browser.test.js`.
-Seven-tab pool regression: `LAVISH_AXI_BROWSER_E2E=1 node --test test/event-transport.browser.test.js`.
-`prepack` and `prepare` both run `build`. `pnpm run check` fails if `skills/lavish/SKILL.md` drifts from `createSkillMarkdown()`, or if root `plugin.json` drifts from `pnpm run build:plugin`. Release-please bumps `plugin.json` through `extra-files`.
+Opt-in browser suites need `chrome-devtools-axi`: `ACRYLAXI_BROWSER_E2E=1 node --test test/layout-audit-browser.test.js test/layout-warning-inbox.browser.test.js`.
+Seven-tab pool regression: `ACRYLAXI_BROWSER_E2E=1 node --test test/event-transport.browser.test.js`.
+`prepack` and `prepare` both run `build`. `pnpm run check` fails if `skills/acrylaxi/SKILL.md` drifts from `createSkillMarkdown()`, or if root `plugin.json` drifts from `pnpm run build:plugin`. Release-please bumps `plugin.json` through `extra-files`.
 
 ## Project conventions
 
 - Node 22+, ESM-only JavaScript (`"type": "module"`). No TypeScript source. `.js` files are validated with `checkJs`.
 - Use TDD for bug fixes and new features (see the `test-driven-development` skill).
 - Run `pnpm run check` before pushing.
-- Treat repo-provided `.agents/` skill content as vendored. Prettier ignores it.
-- Do not hand-edit `CHANGELOG.md` or `.release-please-manifest.json`. Release-please owns them.
-- Human-authored PRs to `main` go through [no-mistakes](https://github.com/kunchenguid/no-mistakes) >= 1.46.0. [CONTRIBUTING.md](CONTRIBUTING.md) owns the gate, the attestation contract, and the workflow-pin rules.
-- Tests that start the server set `LAVISH_AXI_STATE_DIR` and use an ephemeral port.
+- **One name, everywhere.** The command and package are `acrylaxi`, the env prefix is `ACRYLAXI_`, artifact attributes are `data-acrylaxi-*`, the SDK global is `window.acrylaxi`, the Mermaid comment is `%% acrylaxi-icon`, state lives in `~/.acrylaxi/`, the artifact convention directory is `.acrylaxi/`, the skill is `acrylaxi`, and the slash command is `/acrylaxi`. Upstream `lavish` names survive only in deliberate attribution/provenance text, `upstream/lavish-axi`, and its URLs. A rename lands in code, tests, and docs together; a docs/code naming drift is a defect, not a follow-up.
+- **Write-scope discipline.** Keep a change inside the surface that owns the contract it touches. When several agents or people work in one tree, split writes by owned scope (for example `src/**`+`test/**` for code, `docs/**`+root markdown for docs, `marketing/**` for the video) and do not edit another owner's scope. Cross-scope renames are coordinated as one deliberate change, never two drifting halves.
+- **Generated files.** `skills/acrylaxi/SKILL.md` is generated from `src/skill.js`, and root `plugin.json` is generated from `package.json` by `scripts/build-plugin.js`. Never hand-edit either: regenerate with `pnpm run build:skill` / `pnpm run build:plugin` and commit the result, because `pnpm run check` fails on drift.
+- **CHANGELOG ownership.** `CHANGELOG.md` opens with a fork-provenance header that stays; release-please owns every entry after it. Do not hand-edit entries or `.release-please-manifest.json`.
+- **Upstream submodule policy.** `upstream/lavish-axi` is reference material pinned to https://github.com/kunchenguid/lavish-axi. Never edit files under `upstream/`, never build or test them, never import from them. Use only `pnpm run upstream:status` and `pnpm run upstream:pull`, then port what applies by hand and commit the new pin separately from product changes. [docs/upstream-reference.md](docs/upstream-reference.md) owns the policy.
+- Treat repo-provided `.agents/` skill content as vendored brand material. Prettier ignores it.
+- Tests that start the server set `ACRYLAXI_STATE_DIR` and use an ephemeral port.
 - `run()` returns on `--version` / `-v` / `-V` before `ensureStateDir` and telemetry (`test/cli-version.test.js`). New startup work goes after that short-circuit.
 - `canonicalFile` runs `realpath`. Two paths to the same file are one session.
-- `normalizeArgv` must let AXI `RESERVED_COMMANDS` (including `update`) pass through. A bare `lavish-axi update` must not become `open update`.
+- `normalizeArgv` must let AXI `RESERVED_COMMANDS` (including `update`) pass through. A bare `acrylaxi update` must not become `open update`.
 
 ## Safety and correctness
 
 Each line is the rule. [docs/invariants.md](docs/invariants.md) has the failure mode.
 
 - The session key is the canonical artifact path. It is not a secret. No route may treat key possession as authorization. [Process model](docs/invariants.md#process-model).
-- Never signal a listener by port alone. Stop only a Lavish PID bound to that exact address, or `POST /shutdown` on an owned server. [Process model](docs/invariants.md#process-model).
+- Never signal a listener by port alone. Stop only an ACRYL AXI PID bound to that exact address, or `POST /shutdown` on an owned server. [Process model](docs/invariants.md#process-model).
 - Adopt, replace, or stop only a server `isOwnedServer` owns. Another installation's server at a control address is a `SERVER_ERROR`, never used, replaced, or stopped. [Process model](docs/invariants.md#process-model).
 - Every server replacement passes all previously requested hosts through `inheritedListenHosts` (`--also-listen`), dropping only IPs no longer on a local interface. [Process model](docs/invariants.md#process-model).
-- Loopback is always requested. An unresolvable `LAVISH_AXI_HOST` is kept (`keepUnresolved`) and retried, never silently dropped. [Process model](docs/invariants.md#process-model).
+- Loopback is always requested. An unresolvable `ACRYLAXI_HOST` is kept (`keepUnresolved`) and retried, never silently dropped. [Process model](docs/invariants.md#process-model).
 - A wildcard listen request becomes loopback, and an alias that resolves to an all-interfaces address is refused. Never open a wildcard listener. [Process model](docs/invariants.md#process-model).
 - Health probes use `node:http` and destroy the socket on every exit. Do not use `fetch`. [Process model](docs/invariants.md#process-model).
 - Loopback binds first and is the port lock. A failed requested address stays in `pendingBinds` and is retried. Declare request-handler timers before the first bind. [Process model](docs/invariants.md#process-model).
@@ -59,7 +68,7 @@ Each line is the rule. [docs/invariants.md](docs/invariants.md) has the failure 
 - The artifact route injects only the one SDK `<script>` tag. Served artifact bytes otherwise match the file on disk. [Request flow](docs/invariants.md#request-flow).
 - `/api/sessions` refuses a path that is not a regular `.html`/`.htm` file after `realpath`. [Request flow](docs/invariants.md#request-flow).
 - Artifact asset serving (`/artifact/:key/<path>`) stays inside that session's HTML-file directory, resolves with `realpath`, and never serves a symlink target outside that tree. [Request flow](docs/invariants.md#request-flow).
-- Layout detection never emits `feedback`. Only a user prompt and the narrow fatal artifact-failure path may wake `lavish-axi poll`. [Request flow](docs/invariants.md#request-flow).
+- Layout detection never emits `feedback`. Only a user prompt and the narrow fatal artifact-failure path may wake `acrylaxi poll`. [Request flow](docs/invariants.md#request-flow).
 - Layout-diagnostics reports are fire-and-forget and never hold the artifact behind a round-trip. Ordinary layout findings are never relabelled fatal. [Request flow](docs/invariants.md#request-flow).
 - The chrome mints each queued prompt's `prompt_id` (never from the iframe) and removes a queued note only when the transcript acknowledges that id. Evicted ids stay on `chat_ack_ids`. [Request flow](docs/invariants.md#request-flow).
 - Only agent chat entries render as HTML. User entries are always escaped. [Request flow](docs/invariants.md#request-flow).
@@ -76,13 +85,13 @@ Each line is the rule. [docs/invariants.md](docs/invariants.md) has the failure 
 - A layout warning clears only on a newer artifact revision plus a complete pass at the same viewport class. Do not emit `feedback` for a detection. [Passive layout-warning inbox](docs/invariants.md#passive-layout-warning-inbox).
 - The chrome never decides that a warning went away. Display strings come from `serializeLayoutWarnings`. [Passive layout-warning inbox](docs/invariants.md#passive-layout-warning-inbox).
 - The active artifact load is durable in `session.artifact_load`. Only a newer `beginArtifactLoad` retires it, and only an explicit takeover reload replaces a superseded reviewer. [Passive layout-warning inbox](docs/invariants.md#passive-layout-warning-inbox).
-- Reload and gate recovery probe `/health` before navigating. Do not call `location.reload()` directly for these recovery actions; the superseded-reviewer takeover card may reload directly after its 409 response. Sticky "Lavish is not running." copy is never cleared by a later successful load. [Live reload](docs/invariants.md#live-reload).
+- Reload and gate recovery probe `/health` before navigating. Do not call `location.reload()` directly for these recovery actions; the superseded-reviewer takeover card may reload directly after its 409 response. Sticky not-running copy is never cleared by a later successful load. [Live reload](docs/invariants.md#live-reload).
 - Every recovery `/health` probe is bounded by an abort timeout, and its caller restores the control whether the probe answers, fails, or times out. [Live reload](docs/invariants.md#live-reload).
 - Sticky copy never makes the gate overlay sticky. Every failure card keeps the bounded timeout and the **Show anyway** bypass. [Live reload](docs/invariants.md#live-reload).
 - Shutdown banner text must be true for the `reason` that fired. Idle shutdown reloads nothing. [Live reload](docs/invariants.md#live-reload).
 - `chrome-outdated` never reloads by itself, and a restart shows the banner instead of reloading while an unsent draft exists. The log-only shutdown `cause` is never widened into `reason`. [Live reload](docs/invariants.md#live-reload).
 - Review-state restore sets values directly and dispatches no synthetic `change`/`input` events. [Live reload](docs/invariants.md#live-reload).
-- A stored annotation draft is retired only after two artifact revisions report its selector missing. A retired draft is kept verbatim in `lavish-axi:retired-drafts:<key>` and never trimmed. [Live reload](docs/invariants.md#live-reload).
+- A stored annotation draft is retired only after two artifact revisions report its selector missing. A retired draft is kept verbatim in `acrylaxi:retired-drafts:<key>` and never trimmed. [Live reload](docs/invariants.md#live-reload).
 - The whiteboard channel token is not a secret. Trust is session-key binding plus descent from the artifact frame (`isArtifactChildWindow`). [Whiteboard](docs/invariants.md#whiteboard-mermaid-excalidraw).
 - `/whiteboard-frame` stays framable by any origin and requires `?key=`. The channel token is signed over the session key. [Whiteboard](docs/invariants.md#whiteboard-mermaid-excalidraw).
 - Whiteboard scenes persist in per-diagram sidecars, never in `state.json`. Stale user edits are never silently merged, and `handleInit` goes through `resolveWhiteboardInitAction`. [Whiteboard](docs/invariants.md#whiteboard-mermaid-excalidraw).
@@ -105,16 +114,16 @@ Each line is the rule. [docs/invariants.md](docs/invariants.md) has the failure 
 - Export and share inline confined same-directory resources and redact every other absolute `file://` URL to `about:blank` so local paths never leak. [Export (local-asset inlining)](docs/invariants.md#export-local-asset-inlining).
 - Exports strip the injected SDK and escape inlined `</script>`/`</style>`. Hosted shares never include the SDK. [Export (local-asset inlining)](docs/invariants.md#export-local-asset-inlining).
 - `--unpublish` is not a deletion. There is no clear-password path. Empty share flag values are refused. A lost create response must not offer a recovery the host cannot perform. Suggested commands never contain a password placeholder. [Hosted sharing (ht-ml.app)](docs/invariants.md#hosted-sharing-ht-mlapp).
-- Share passwords are minted only in `src/share-password.js`. Lavish persists neither the password nor `update_key`. [Hosted sharing (ht-ml.app)](docs/invariants.md#hosted-sharing-ht-mlapp).
+- Share passwords are minted only in `src/share-password.js`. ACRYL AXI persists neither the password nor `update_key`. [Hosted sharing (ht-ml.app)](docs/invariants.md#hosted-sharing-ht-mlapp).
 - The share route echoes a password only when it minted one. [Hosted sharing (ht-ml.app)](docs/invariants.md#hosted-sharing-ht-mlapp).
 - Share writes classify failure through `hostRejectedShareWrite`, where only a 4xx proves nothing landed. An echoed `site_id` is untrusted, and recovery commands come only from `republishCommand`/`unpublishCommand`. [Hosted sharing (ht-ml.app)](docs/invariants.md#hosted-sharing-ht-mlapp).
 - Every surface reporting a page as newly gated carries the CDN public-to-private caveat. [Hosted sharing (ht-ml.app)](docs/invariants.md#hosted-sharing-ht-mlapp).
 - `DESIGN_PRIORITY_RULE` is stated once in `src/design-reference.js`. Do not restate it. Do not hardcode one Mermaid theme. [AXI integration](docs/invariants.md#axi-integration).
 - Poll wake-path guidance comes only from `POLL_WAKE_PATH_RULES`. [AXI integration](docs/invariants.md#axi-integration).
 - The internal brand skill keeps `metadata.internal: true`. The generated skill omits a `version` frontmatter field. [AXI integration](docs/invariants.md#axi-integration).
-- `plugin.json` and `skills/lavish` stay in `package.json` `files`. Skill frontmatter stays inside `validateSkillMarkdown`'s allowed shape. An unlinkable plugin client is reported, never thrown. Do not ship `mcp.json`. [Agent Plugins packaging](docs/invariants.md#agent-plugins-packaging).
+- `plugin.json` and `skills/acrylaxi` stay in `package.json` `files`. Skill frontmatter stays inside `validateSkillMarkdown`'s allowed shape. An unlinkable plugin client is reported, never thrown. Do not ship `mcp.json`. [Agent Plugins packaging](docs/invariants.md#agent-plugins-packaging).
 - Plugin setup runs only on explicit invocation, drops only locations `isStalePluginLocation` attributes to this plugin, and never rewrites unparseable VS Code settings. [Agent Plugins packaging](docs/invariants.md#agent-plugins-packaging).
-- Telemetry is best-effort and must never affect CLI behavior. Users opt out with `LAVISH_AXI_TELEMETRY=0`. [Telemetry](docs/invariants.md#telemetry).
+- Telemetry is best-effort and must never affect CLI behavior. Users opt out with `ACRYLAXI_TELEMETRY=0`. [Telemetry](docs/invariants.md#telemetry).
 - Every artifact-to-chrome message goes through `postArtifactMessage`. The artifact iframe stays sandboxed without `allow-same-origin`. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).
 - Every `/artifact/*` response carries the CSP `sandbox` policy matching the iframe, so an escaped popup stays opaque-origin. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).
 - SDK helpers that the browser must call are exported functions in a module `serializeModuleHelpers` inlines. No module-level constants. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).
@@ -122,7 +131,7 @@ Each line is the rule. [docs/invariants.md](docs/invariants.md) has the failure 
 - Mermaid pan and zoom touch only the live SVG `viewBox`, never the saved artifact. `normalizeMermaidNodeTarget` strips node targets to their fixed shape. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).
 - Table-cell annotations name a row or column only when it is provable and stay silent otherwise. `snapshot()` never computes table targets. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).
 - A text annotation's `prompt.selector` names the container, not the selected range. Never target text by selector alone. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).
-- Annotation handlers ignore native controls, editable regions, and `data-lavish-action` elements. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).
+- Annotation handlers ignore native controls, editable regions, and `data-acrylaxi-action` elements. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).
 - `resetRevisionLegend()` runs only when `replaceArtifactFrame` actually assigns `frame.src`. Reject over-long revision ids and selectors. Lookups use `Map`/`Set`. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).
 - The revision legend's per-row cap derives from `revisionPalette()` length, never a second number. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).
 - A keyboard shortcut that must work in both chrome and the artifact needs a capture-phase listener in both `src/chrome-client.js` and `src/artifact-sdk.js`, and it requires a modifier. [Things to know when editing](docs/invariants.md#things-to-know-when-editing).

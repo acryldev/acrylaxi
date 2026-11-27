@@ -1,0 +1,406 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--paper);
+      font-family: var(--sans);
+      color: var(--ink);
+    }
+
+    #root *,
+    #root *::before,
+    #root *::after {
+      box-sizing: border-box;
+    }
+
+    /* ── top chrome ─────────────────────────────────────────────── */
+    .s1-chrome {
+      position: absolute;
+      top: 92px;
+      left: 120px;
+      right: 120px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .s1-chrome .right {
+      font-size: 17px;
+      letter-spacing: 0.14em;
+      color: var(--ink-4);
+      text-transform: uppercase;
+    }
+
+    /* ── the wall of prose ──────────────────────────────────────── */
+    .s1-wall {
+      position: absolute;
+      left: 120px;
+      top: 196px;
+      width: 1084px;
+      height: 716px;
+      background: var(--panel);
+      border: 1px solid var(--hair);
+      overflow: hidden;
+    }
+    .s1-wallbar {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--hair);
+      background: #f7f7f5;
+    }
+    .s1-wallbar .who {
+      font-family: var(--mono);
+      font-size: 17px;
+      letter-spacing: 0.08em;
+      color: var(--ink-2);
+    }
+    .s1-wallbar .who b {
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .s1-wallbar .tag {
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      color: var(--ink-4);
+      text-transform: uppercase;
+    }
+    .s1-prose {
+      padding: 30px 40px 0 40px;
+    }
+    .s1-line {
+      font-size: 25px;
+      line-height: 1.62;
+      color: var(--ink-2);
+      white-space: nowrap;
+      letter-spacing: -0.005em;
+    }
+    .s1-caret {
+      display: inline-block;
+      width: 11px;
+      height: 20px;
+      margin-left: 3px;
+      background: var(--ink);
+      transform: translateY(2px);
+    }
+
+    /* ── human replies ──────────────────────────────────────────── */
+    .s1-replies {
+      position: absolute;
+      left: 1276px;
+      top: 236px;
+      width: 524px;
+    }
+    .s1-reply {
+      position: absolute;
+      left: 0;
+      width: 524px;
+      background: var(--paper);
+      border: 1px solid var(--hair);
+      padding: 22px 24px;
+      font-size: 26px;
+      line-height: 1.34;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .s1-reply .who {
+      display: block;
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      color: var(--ink-4);
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+    .s1-r1 {
+      top: 0;
+    }
+    .s1-r2 {
+      top: 300px;
+    }
+    .s1-r3 {
+      top: 604px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .s1-dot {
+      width: 9px;
+      height: 9px;
+      background: var(--ink-3);
+      display: inline-block;
+    }
+
+    /* screenshot chips */
+    .s1-shots {
+      position: absolute;
+      left: 0;
+      display: flex;
+      gap: 16px;
+    }
+    .s1-shots.one {
+      top: 150px;
+    }
+    .s1-shots.two {
+      top: 420px;
+    }
+    .s1-shot {
+      width: 220px;
+    }
+    .s1-shot .tile {
+      position: relative;
+      width: 220px;
+      height: 132px;
+      border: 1px solid var(--hair);
+      background: #fbfbfa;
+      overflow: hidden;
+    }
+    .s1-shot .bar {
+      height: 16px;
+      background: #eeedea;
+      border-bottom: 1px solid var(--hair-soft);
+    }
+    .s1-shot .body {
+      padding: 9px 10px;
+    }
+    .s1-shot .row {
+      height: 7px;
+      background: #e6e5e1;
+      margin-bottom: 6px;
+    }
+    .s1-shot .row.w1 {
+      width: 78%;
+    }
+    .s1-shot .row.w2 {
+      width: 54%;
+    }
+    .s1-shot .blk {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      width: 62px;
+      height: 34px;
+      background: #eae9e5;
+      border: 1px solid #e2e1dc;
+    }
+    .s1-shot svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .s1-shot .label {
+      margin-top: 8px;
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      color: var(--ink-4);
+    }
+
+    /* ── closing statement ──────────────────────────────────────── */
+    .s1-punch {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+    }
+    .s1-punch-bg {
+      position: absolute;
+      inset: 0;
+      background: var(--paper);
+      transform-origin: 0% 50%;
+    }
+    .s1-punch-in {
+      position: absolute;
+      left: 120px;
+      top: 296px;
+      width: 1680px;
+    }
+    .s1-punch-in .eyebrow {
+      margin-bottom: 34px;
+    }
+    .s1-punch-in h2 {
+      margin: 0;
+      font-size: 78px;
+      font-weight: 500;
+      line-height: 1.12;
+      letter-spacing: -0.035em;
+      color: var(--ink);
+    }
+    .s1-punch-in .sub {
+      margin-top: 30px;
+      font-family: var(--mono);
+      font-size: 20px;
+      letter-spacing: 0.04em;
+      color: var(--ink-3);
+    }
+  </style>
+
+  <div id="root" data-composition-id="s1" data-width="1920" data-height="1080">
+    <div class="grid-surface"></div>
+
+    <div class="s1-chrome">
+      <div class="eyebrow">The old loop</div>
+      <div class="right mono">agent → human → agent</div>
+    </div>
+
+    <!-- beat 1: the agent answers in a wall of prose -->
+    <div class="clip s1-wall" id="s1-wall" data-start="0" data-duration="7.7">
+      <div class="s1-wallbar">
+        <div class="who"><b>agent</b> · answer</div>
+        <div class="tag">prose</div>
+      </div>
+      <div class="s1-prose" id="s1-prose">
+        <div class="s1-line">Restructure onboarding in three phases. First, collapse the</div>
+        <div class="s1-line">three entry points into a single intent picker so the router</div>
+        <div class="s1-line">stops branching and the first screen can paint before the</div>
+        <div class="s1-line">workspace payload resolves. Second, move the workspace</div>
+        <div class="s1-line">fetch behind a suspense boundary and keep the shell static</div>
+        <div class="s1-line">until it lands. Third, leave the old route in place as a</div>
+        <div class="s1-line">redirect for one release so the audit path keeps working.</div>
+        <div class="s1-line">The picker is a small state machine: idle, choosing, and</div>
+        <div class="s1-line">confirming, with the confirm step deferred until the</div>
+        <div class="s1-line">workspace resolves. That removes the double spinner we</div>
+        <div class="s1-line">saw in the audit and keeps the back-button history intact.</div>
+        <div class="s1-line">On copy, rename “workspace” to “project” everywhere in the</div>
+        <div class="s1-line">flow — empty state, toasts, and the settings header — since</div>
+        <div class="s1-line">the two words have drifted for a while now.<span class="s1-caret" id="s1-caret"></span></div>
+      </div>
+    </div>
+
+    <!-- beat 2: the human answers with screenshots -->
+    <div class="clip s1-replies" id="s1-replies" data-start="2.4" data-duration="5.3">
+      <div class="s1-reply s1-r1" id="s1-r1">
+        <span class="who">you</span>
+        no — the second card, and more space above it
+      </div>
+
+      <div class="s1-shots one" id="s1-shots1">
+        <div class="s1-shot">
+          <div class="tile">
+            <div class="bar"></div>
+            <div class="body">
+              <div class="row"></div>
+              <div class="row w1"></div>
+              <div class="row"></div>
+              <div class="row w2"></div>
+            </div>
+            <div class="blk"></div>
+            <svg viewBox="0 0 220 132" fill="none" aria-hidden="true">
+              <path
+                id="s1-circle"
+                d="M148 38 C176 46 196 68 190 86 C183 108 140 116 106 110 C70 104 52 84 60 66 C68 48 106 32 148 38"
+                stroke="#6e6e68"
+                stroke-width="2.4"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <div class="label">screenshot.png</div>
+        </div>
+      </div>
+
+      <div class="s1-reply s1-r2" id="s1-r2">
+        <span class="who">you</span>
+        still not that one
+      </div>
+
+      <div class="s1-shots two" id="s1-shots2">
+        <div class="s1-shot">
+          <div class="tile">
+            <div class="bar"></div>
+            <div class="body">
+              <div class="row"></div>
+              <div class="row w2"></div>
+              <div class="row w1"></div>
+            </div>
+          </div>
+          <div class="label">screenshot-2.png</div>
+        </div>
+        <div class="s1-shot">
+          <div class="tile">
+            <div class="bar"></div>
+            <div class="body">
+              <div class="row w1"></div>
+              <div class="row"></div>
+              <div class="row w2"></div>
+            </div>
+          </div>
+          <div class="label">screenshot-3.png</div>
+        </div>
+      </div>
+
+      <div class="s1-reply s1-r3" id="s1-r3">
+        <span class="who">you</span>
+        <span class="s1-dot" id="s1-dot1"></span>
+        <span class="s1-dot" id="s1-dot2"></span>
+        <span class="s1-dot" id="s1-dot3"></span>
+      </div>
+    </div>
+
+    <!-- beat 3: the cost, stated plainly -->
+    <div class="clip s1-punch" id="s1-punch" data-start="7.35" data-duration="2.15">
+      <div class="s1-punch-bg" id="s1-punch-bg"></div>
+      <div class="s1-punch-in">
+        <div class="eyebrow" id="s1-punch-eyebrow">Three rounds in</div>
+        <h2 id="s1-punch-line">Still describing spacing<br />in words.</h2>
+        <div class="sub" id="s1-punch-sub">the loop, before the artifact becomes the interface</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const L = gsap.utils.toArray(".s1-line");
+
+      // chrome
+      // frame 0 is the wall itself: the film opens on the thing being complained about
+      tl.set(".s1-chrome .eyebrow", { opacity: 1 }, 0);
+      tl.set(".s1-chrome .right", { opacity: 1 }, 0);
+      tl.fromTo("#s1-wall", { opacity: 1, y: 10, scale: 0.997 }, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: "power3.out" }, 0);
+      L.slice(7).forEach(function (el, i) {
+        tl.fromTo(el, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.32, ease: "power2.out" }, 0.15 + i * 0.16);
+      });
+      // caret blinks a few times, then goes
+      tl.fromTo("#s1-caret", { opacity: 1 }, { opacity: 0, duration: 0.28, repeat: 3, yoyo: true, ease: "none" }, 0.5);
+      tl.set("#s1-caret", { opacity: 0 }, 2.1);
+
+      // replies
+      tl.fromTo("#s1-r1", { opacity: 0, x: 26, y: 8 }, { opacity: 1, x: 0, y: 0, duration: 0.5, ease: "power3.out" }, 2.4);
+      tl.fromTo("#s1-shots1", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 2.78);
+      tl.fromTo(
+        "#s1-circle",
+        { strokeDasharray: 420, strokeDashoffset: 420 },
+        { strokeDashoffset: 0, duration: 0.55, ease: "power1.inOut" },
+        3.05,
+      );
+
+      tl.fromTo("#s1-r2", { opacity: 0, x: 26 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 4.0);
+      tl.fromTo("#s1-shots2", { opacity: 0, y: 14, scale: 0.985 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power2.out" }, 4.3);
+      tl.fromTo("#s1-r3", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 5.55);
+      tl.fromTo(
+        ["#s1-dot1", "#s1-dot2", "#s1-dot3"],
+        { opacity: 0.2 },
+        { opacity: 1, duration: 0.35, stagger: 0.14, repeat: 2, yoyo: true, ease: "sine.inOut" },
+        5.8,
+      );
+
+      // the wall recedes as the answers pile up
+      tl.to("#s1-wall", { scale: 0.992, opacity: 0.72, duration: 0.7, ease: "power2.inOut" }, 6.5);
+
+      // statement
+      tl.fromTo("#s1-punch-bg", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power3.inOut" }, 7.35);
+      tl.fromTo("#s1-punch-eyebrow", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 7.6);
+      tl.fromTo("#s1-punch-line", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 7.68);
+      tl.fromTo("#s1-punch-sub", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 7.95);
+
+      window.__timelines["s1"] = tl;
+    })();
+  </script>
+</template>

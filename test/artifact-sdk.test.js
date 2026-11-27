@@ -4,7 +4,7 @@ import test from "node:test";
 import {
   classifyMaterialRectEscape,
   classifySevereTextOverflow,
-  deriveLavishQueueKey,
+  deriveAcrylaxiQueueKey,
   findStableLayoutFindings,
   isMaterialPageOverflow,
   isModeToggleHotkeyEvent,
@@ -62,7 +62,7 @@ function matchesSelectorList(el, selectorList) {
 
 function matchesSelector(el, selector) {
   if (selector === "form" || selector === "fieldset") return el.tagName.toLowerCase() === selector;
-  if (selector === "[data-lavish-question]") return el.getAttribute("data-lavish-question") !== null;
+  if (selector === "[data-acrylaxi-question]") return el.getAttribute("data-acrylaxi-question") !== null;
   if (selector === "[contenteditable]:not([contenteditable='false'])") {
     const value = el.getAttribute("contenteditable");
     return value !== null && value !== "false";
@@ -159,75 +159,75 @@ test("isNativeInteractiveControl allows details as a text selection ancestor", (
   assert.equal(isNativeInteractiveControl(secondParagraph), false);
 });
 
-test("deriveLavishQueueKey uses explicit queueKey first", () => {
+test("deriveAcrylaxiQueueKey uses explicit queueKey first", () => {
   const input = node("input", { type: "radio", name: "plan" });
 
-  assert.equal(deriveLavishQueueKey(input, { queueKey: "deployment-plan" }), "deployment-plan");
+  assert.equal(deriveAcrylaxiQueueKey(input, { queueKey: "deployment-plan" }), "deployment-plan");
 });
 
-test("deriveLavishQueueKey allows explicit empty queueKey to suppress derivation", () => {
+test("deriveAcrylaxiQueueKey allows explicit empty queueKey to suppress derivation", () => {
   const button = node("button");
-  node("section", { "data-lavish-question": "deployment-plan" }, [button]);
+  node("section", { "data-acrylaxi-question": "deployment-plan" }, [button]);
 
-  assert.equal(deriveLavishQueueKey(button, { queueKey: "" }), "");
+  assert.equal(deriveAcrylaxiQueueKey(button, { queueKey: "" }), "");
 });
 
-test("deriveLavishQueueKey groups controls inside data-lavish-question", () => {
+test("deriveAcrylaxiQueueKey groups controls inside data-acrylaxi-question", () => {
   const first = node("button");
   const second = node("button");
-  node("section", { "data-lavish-question": "deployment-plan" }, [first, second]);
+  node("section", { "data-acrylaxi-question": "deployment-plan" }, [first, second]);
 
-  assert.equal(deriveLavishQueueKey(first), "question:deployment-plan");
-  assert.equal(deriveLavishQueueKey(second), "question:deployment-plan");
+  assert.equal(deriveAcrylaxiQueueKey(first), "question:deployment-plan");
+  assert.equal(deriveAcrylaxiQueueKey(second), "question:deployment-plan");
 });
 
-test("deriveLavishQueueKey groups radio options by scoped group name", () => {
+test("deriveAcrylaxiQueueKey groups radio options by scoped group name", () => {
   const planA = node("input", { id: "plan-a", type: "radio", name: "plan", value: "A" });
   const planB = node("input", { id: "plan-b", type: "radio", name: "plan", value: "B" });
   node("form", { id: "deploy" }, [planA, planB]);
 
-  assert.equal(deriveLavishQueueKey(planA), "radio:form:deploy:plan");
-  assert.equal(deriveLavishQueueKey(planB), "radio:form:deploy:plan");
+  assert.equal(deriveAcrylaxiQueueKey(planA), "radio:form:deploy:plan");
+  assert.equal(deriveAcrylaxiQueueKey(planB), "radio:form:deploy:plan");
 });
 
-test("deriveLavishQueueKey keeps same radio names independent across scopes", () => {
+test("deriveAcrylaxiQueueKey keeps same radio names independent across scopes", () => {
   const first = node("input", { type: "radio", name: "plan", value: "A" });
   const second = node("input", { type: "radio", name: "plan", value: "B" });
   node("form", { id: "deploy-one" }, [first]);
   node("form", { id: "deploy-two" }, [second]);
 
-  assert.notEqual(deriveLavishQueueKey(first), deriveLavishQueueKey(second));
+  assert.notEqual(deriveAcrylaxiQueueKey(first), deriveAcrylaxiQueueKey(second));
 });
 
-test("deriveLavishQueueKey does not infer plain button grouping without question metadata", () => {
+test("deriveAcrylaxiQueueKey does not infer plain button grouping without question metadata", () => {
   const button = node("button");
 
-  assert.equal(deriveLavishQueueKey(button), "");
+  assert.equal(deriveAcrylaxiQueueKey(button), "");
 });
 
-test("deriveLavishQueueKey keys checkbox toggles per checkbox, not per group", () => {
+test("deriveAcrylaxiQueueKey keys checkbox toggles per checkbox, not per group", () => {
   const first = node("input", { type: "checkbox", name: "feature", value: "search" });
   const second = node("input", { type: "checkbox", name: "feature", value: "billing" });
   node("form", { id: "features" }, [first, second]);
 
-  assert.notEqual(deriveLavishQueueKey(first), deriveLavishQueueKey(second));
+  assert.notEqual(deriveAcrylaxiQueueKey(first), deriveAcrylaxiQueueKey(second));
 });
 
-test("deriveLavishQueueKey does not collide checkbox default values", () => {
+test("deriveAcrylaxiQueueKey does not collide checkbox default values", () => {
   const first = node("input", { id: "search", type: "checkbox", name: "feature" });
   const second = node("input", { id: "billing", type: "checkbox", name: "feature" });
   first.value = "on";
   second.value = "on";
   node("form", { id: "features" }, [first, second]);
 
-  assert.notEqual(deriveLavishQueueKey(first), deriveLavishQueueKey(second));
+  assert.notEqual(deriveAcrylaxiQueueKey(first), deriveAcrylaxiQueueKey(second));
 });
 
-test("deriveLavishQueueKey keys named selects as fields", () => {
+test("deriveAcrylaxiQueueKey keys named selects as fields", () => {
   const select = node("select", { name: "region" });
   node("form", { id: "deploy" }, [select]);
 
-  assert.equal(deriveLavishQueueKey(select), "field:form:deploy:region");
+  assert.equal(deriveAcrylaxiQueueKey(select), "field:form:deploy:region");
 });
 
 test("classifySevereTextOverflow ignores font ink that stays within the rendered line box", () => {

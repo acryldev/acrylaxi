@@ -51,11 +51,15 @@ jobs:
       - run: pnpm run build
         if: ${{ steps.release.outputs.release_created }}
         env:
-          LAVISH_AXI_UMAMI_HOST: https://a.kunchenguid.com
-          LAVISH_AXI_UMAMI_WEBSITE_ID: ${{ vars.LAVISH_AXI_UMAMI_WEBSITE_ID }}
+          # Optional repo variables. Left unset, telemetry stays disabled: there is no
+          # built-in endpoint, so a release build never reports anywhere by default.
+          ACRYLAXI_UMAMI_HOST: ${{ vars.ACRYLAXI_UMAMI_HOST }}
+          ACRYLAXI_UMAMI_WEBSITE_ID: ${{ vars.ACRYLAXI_UMAMI_WEBSITE_ID }}
 
       - run: npm publish --access public --provenance
         if: ${{ steps.release.outputs.release_created }}
         env:
-          LAVISH_AXI_UMAMI_HOST: https://a.kunchenguid.com
-          LAVISH_AXI_UMAMI_WEBSITE_ID: ${{ vars.LAVISH_AXI_UMAMI_WEBSITE_ID }}
+          # Optional repo variables. Left unset, telemetry stays disabled: there is no
+          # built-in endpoint, so a release build never reports anywhere by default.
+          ACRYLAXI_UMAMI_HOST: ${{ vars.ACRYLAXI_UMAMI_HOST }}
+          ACRYLAXI_UMAMI_WEBSITE_ID: ${{ vars.ACRYLAXI_UMAMI_WEBSITE_ID }}

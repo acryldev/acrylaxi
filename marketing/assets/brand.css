@@ -1,0 +1,117 @@
+/* ACRYL AXI — brand layer
+   Space Grotesk (variable) + JetBrains Mono, both shipped locally. */
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("fonts/space-grotesk-latin-wght.woff2") format("woff2-variations");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/jetbrains-mono-latin-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/jetbrains-mono-latin-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/jetbrains-mono-latin-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+:root {
+  --paper: #ffffff;
+  --panel: #f4f4f2;
+  --panel-2: #efefec;
+  --ink: #171717;
+  --ink-2: #3b3b38;
+  --ink-3: #63635e;
+  --ink-4: #6b6b65;
+  --hair: #ddddda;
+  --hair-soft: #ecebe7;
+  --sans: "Space Grotesk", sans-serif;
+  --mono: "JetBrains Mono", monospace;
+  /* the logo rainbow, used sparingly: one arc, one glow, one rule */
+  --grad: linear-gradient(
+    90deg,
+    #8a2be2 0%,
+    #2f6bff 24%,
+    #00b3a4 46%,
+    #6fd41e 64%,
+    #ffd21e 80%,
+    #ff5c00 100%
+  );
+
+  /* dark variant, used only for the loop */
+  --ink-canvas: #171717;
+  --ink-panel: #1d1d1b;
+  --ink-hair: #2f2f2c;
+  --ink-hair-soft: #262624;
+  --ink-fg: #f2f2ef;
+  --ink-fg-2: #b8b8b1;
+  --ink-fg-3: #97978f;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  line-height: 1;
+}
+
+.grid-surface {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--hair-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--hair-soft) 1px, transparent 1px);
+  background-size: 96px 96px;
+  background-position: 0 0;
+}
+
+.grid-surface.inverse {
+  background-image:
+    linear-gradient(to right, var(--ink-hair-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--ink-hair-soft) 1px, transparent 1px);
+}

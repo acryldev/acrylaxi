@@ -135,9 +135,9 @@ test("parseLibraryIconDirectives reads flowchart icon comments only", () => {
   const source = [
     "%%{init: {'theme': 'dark'}}%%",
     "flowchart LR",
-    "  %% lavish-icon api aws/AWS Lambda",
-    "  %%lavish-icon   db   aws/Amazon DynamoDB  ",
-    "  %% lavish-icon broken",
+    "  %% acrylaxi-icon api aws/AWS Lambda",
+    "  %%acrylaxi-icon   db   aws/Amazon DynamoDB  ",
+    "  %% acrylaxi-icon broken",
     "  %% a normal comment",
     "  api[Orders API] --> db[(Orders)]",
   ].join("\n");
@@ -145,9 +145,11 @@ test("parseLibraryIconDirectives reads flowchart icon comments only", () => {
     { nodeId: "api", ref: "aws/AWS Lambda" },
     { nodeId: "db", ref: "aws/Amazon DynamoDB" },
   ]);
-  assert.deepEqual(parseLibraryIconDirectives("graph TD\n%% lavish-icon a x/y\na-->b"), [{ nodeId: "a", ref: "x/y" }]);
-  assert.deepEqual(parseLibraryIconDirectives("sequenceDiagram\n%% lavish-icon a x/y\na->>b: hi"), []);
-  assert.deepEqual(parseLibraryIconDirectives("---\ntitle: T\n---\nflowchart TD\n%% lavish-icon a x/y\na-->b"), [
+  assert.deepEqual(parseLibraryIconDirectives("graph TD\n%% acrylaxi-icon a x/y\na-->b"), [
+    { nodeId: "a", ref: "x/y" },
+  ]);
+  assert.deepEqual(parseLibraryIconDirectives("sequenceDiagram\n%% acrylaxi-icon a x/y\na->>b: hi"), []);
+  assert.deepEqual(parseLibraryIconDirectives("---\ntitle: T\n---\nflowchart TD\n%% acrylaxi-icon a x/y\na-->b"), [
     { nodeId: "a", ref: "x/y" },
   ]);
 });
@@ -159,7 +161,7 @@ test("libraryIconSignature is empty without directives and tracks referenced ite
     }),
   ];
   assert.equal(libraryIconSignature("flowchart TD\n a-->b", make(10)), "");
-  const source = "flowchart TD\n%% lavish-icon a aws/Lambda\n a-->b";
+  const source = "flowchart TD\n%% acrylaxi-icon a aws/Lambda\n a-->b";
   assert.notEqual(libraryIconSignature(source, make(10)), "");
   assert.equal(libraryIconSignature(source, make(10)), libraryIconSignature(source, make(10)));
   assert.notEqual(libraryIconSignature(source, make(10)), libraryIconSignature(source, make(20)));
@@ -175,8 +177,8 @@ test("toExcalidrawLibraryItems stamps every element with its library ref", () =>
   const [item] = toExcalidrawLibraryItems(libraries);
   assert.equal(item.name, "Lambda");
   assert.equal(item.status, "published");
-  assert.equal(item.id, "lavish:aws/Lambda");
-  assert.deepEqual(item.elements[0].customData, { lavishLibraryRef: "aws/Lambda" });
+  assert.equal(item.id, "acrylaxi:aws/Lambda");
+  assert.deepEqual(item.elements[0].customData, { acrylaxiLibraryRef: "aws/Lambda" });
   assert.equal(libraries[0].items[0].elements[0].customData, undefined);
 });
 
@@ -196,7 +198,7 @@ test("toExcalidrawLibraryItems groups multi-element items that are not grouped a
   const [loose, grouped, single] = toExcalidrawLibraryItems(libraries);
   assert.deepEqual(
     loose.elements.map((element) => element.groupIds),
-    [["lavish-item:sys/Loose"], ["lavish-item:sys/Loose"]],
+    [["acrylaxi-item:sys/Loose"], ["acrylaxi-item:sys/Loose"]],
   );
   assert.deepEqual(
     grouped.elements.map((element) => element.groupIds),

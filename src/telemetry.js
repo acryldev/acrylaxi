@@ -1,33 +1,37 @@
-const HARDCODED_FALLBACK_HOST = "https://a.kunchenguid.com";
 const UMAMI_PATH = "/api/send";
 const DEFAULT_HOSTNAME = "cli";
-const DEFAULT_TITLE = "Lavish Editor CLI";
+const DEFAULT_TITLE = "Acrylaxi CLI";
 const DEFAULT_REQUEST_TIMEOUT_MS = 1_000;
 
 export function resolveTelemetryConfig(input) {
-  const optOut = String(input.env.LAVISH_AXI_TELEMETRY || "")
+  const optOut = String(input.env.ACRYLAXI_TELEMETRY || "")
     .trim()
     .toLowerCase();
   if (optOut === "0" || optOut === "false" || optOut === "off") {
     return { enabled: false, host: "", websiteID: "" };
   }
 
-  const websiteID = String(input.env.LAVISH_AXI_UMAMI_WEBSITE_ID || "").trim() || input.buildWebsiteID.trim();
+  const websiteID = String(input.env.ACRYLAXI_UMAMI_WEBSITE_ID || "").trim() || input.buildWebsiteID.trim();
   if (!websiteID) {
     return { enabled: false, host: "", websiteID: "" };
   }
 
-  const host =
-    String(input.env.LAVISH_AXI_UMAMI_HOST || "").trim() || input.buildHost.trim() || HARDCODED_FALLBACK_HOST;
+  // Both a website id and a host have to be configured explicitly. There is deliberately
+  // no built-in endpoint: an unconfigured build never sends anything anywhere.
+  const host = String(input.env.ACRYLAXI_UMAMI_HOST || "").trim() || input.buildHost.trim();
+  if (!host) {
+    return { enabled: false, host: "", websiteID: "" };
+  }
+
   return { enabled: true, host, websiteID };
 }
 
 export function getBuildTimeUmamiHost() {
-  return process.env.LAVISH_AXI_BUILD_UMAMI_HOST || "";
+  return process.env.ACRYLAXI_BUILD_UMAMI_HOST || "";
 }
 
 export function getBuildTimeUmamiWebsiteID() {
-  return process.env.LAVISH_AXI_BUILD_UMAMI_WEBSITE_ID || "";
+  return process.env.ACRYLAXI_BUILD_UMAMI_WEBSITE_ID || "";
 }
 
 export function createTelemetryClient(config) {

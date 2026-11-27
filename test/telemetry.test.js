@@ -35,7 +35,7 @@ function createFetchSpy(options = {}) {
 
 test("telemetry can be disabled by environment", () => {
   const config = resolveTelemetryConfig({
-    env: { LAVISH_AXI_TELEMETRY: "0" },
+    env: { ACRYLAXI_TELEMETRY: "0" },
     buildHost: "https://build.example",
     buildWebsiteID: "build-id",
   });
@@ -46,8 +46,8 @@ test("telemetry can be disabled by environment", () => {
 test("telemetry uses env values before build-time defaults", () => {
   const config = resolveTelemetryConfig({
     env: {
-      LAVISH_AXI_UMAMI_HOST: " https://env.example ",
-      LAVISH_AXI_UMAMI_WEBSITE_ID: " env-id ",
+      ACRYLAXI_UMAMI_HOST: " https://env.example ",
+      ACRYLAXI_UMAMI_WEBSITE_ID: " env-id ",
     },
     buildHost: "https://build.example",
     buildWebsiteID: "build-id",
@@ -70,13 +70,33 @@ test("telemetry disables when no website id is configured", () => {
   assert.equal(config.enabled, false);
 });
 
+test("telemetry disables when no host is configured, because it has no built-in endpoint", () => {
+  const config = resolveTelemetryConfig({
+    env: {},
+    buildHost: "",
+    buildWebsiteID: "build-id",
+  });
+
+  assert.deepEqual(config, { enabled: false, host: "", websiteID: "" });
+});
+
+test("telemetry can be configured entirely at build time", () => {
+  const config = resolveTelemetryConfig({
+    env: {},
+    buildHost: "https://build.example",
+    buildWebsiteID: "build-id",
+  });
+
+  assert.deepEqual(config, { enabled: true, host: "https://build.example", websiteID: "build-id" });
+});
+
 test("telemetry sends anonymous Umami event payloads", async () => {
   const { fetch, requests } = createFetchSpy();
   const client = createTelemetryClient({
     enabled: true,
     host: "https://a.example.com/umami/",
     websiteID: "site-1",
-    app: "lavish-axi",
+    app: "acrylaxi",
     version: "1.2.3",
     platform: "darwin",
     arch: "arm64",
@@ -90,11 +110,11 @@ test("telemetry sends anonymous Umami event payloads", async () => {
   assert.equal(requests[0].url, "https://a.example.com/umami/api/send");
   assert.equal(requests[0].method, "POST");
   assert.equal(requests[0].headers["Content-Type"], "application/json");
-  assert.match(requests[0].headers["User-Agent"], /^lavish-axi\/1\.2\.3 telemetry$/);
+  assert.match(requests[0].headers["User-Agent"], /^acrylaxi\/1\.2\.3 telemetry$/);
   assert.deepEqual(requests[0].body.payload.website, "site-1");
   assert.deepEqual(requests[0].body.payload.hostname, "cli");
-  assert.deepEqual(requests[0].body.payload.title, "Lavish Editor CLI");
-  assert.deepEqual(requests[0].body.payload.url, "app://lavish-axi/command");
+  assert.deepEqual(requests[0].body.payload.title, "Acrylaxi CLI");
+  assert.deepEqual(requests[0].body.payload.url, "app://acrylaxi/command");
   assert.deepEqual(requests[0].body.payload.name, "command");
   assert.deepEqual(requests[0].body.payload.data.command, "poll");
   assert.deepEqual(requests[0].body.payload.data.status, "success");
@@ -109,7 +129,7 @@ test("telemetry is best effort and never throws fetch failures", async () => {
     enabled: true,
     host: "https://a.example.com",
     websiteID: "site-1",
-    app: "lavish-axi",
+    app: "acrylaxi",
     version: "1.0.0",
     fetch: createFetchSpy({ throws: new Error("network down") }).fetch,
   });
@@ -124,7 +144,7 @@ test("telemetry close waits only up to the requested timeout", async () => {
     enabled: true,
     host: "https://a.example.com",
     websiteID: "site-1",
-    app: "lavish-axi",
+    app: "acrylaxi",
     version: "1.0.0",
     fetch,
   });

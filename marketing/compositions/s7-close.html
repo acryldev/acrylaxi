@@ -1,0 +1,282 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--paper);
+      font-family: var(--sans);
+      color: var(--ink);
+    }
+    #root *,
+    #root *::before,
+    #root *::after {
+      box-sizing: border-box;
+    }
+
+    .s7-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, var(--hair-soft) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--hair-soft) 1px, transparent 1px);
+      background-size: 96px 96px;
+    }
+
+    .s7-glow {
+      position: absolute;
+      left: 50%;
+      top: 114px;
+      width: 520px;
+      height: 520px;
+      margin-left: -260px;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 92, 0, 0.12) 0%,
+        rgba(138, 43, 226, 0.07) 26%,
+        rgba(47, 107, 255, 0.055) 44%,
+        rgba(0, 179, 164, 0.035) 58%,
+        rgba(255, 255, 255, 0) 72%
+      );
+      transform-origin: 50% 50%;
+    }
+    .s7-mark {
+      position: absolute;
+      left: 50%;
+      top: 132px;
+      width: 168px;
+      height: 168px;
+      margin-left: -84px;
+      object-fit: contain;
+      transform-origin: 50% 50%;
+    }
+
+    .s7-word {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 332px;
+      text-align: center;
+      font-size: 108px;
+      font-weight: 500;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .s7-word span {
+      display: inline-block;
+    }
+    .s7-word .sp {
+      width: 0.22em;
+    }
+    .s7-sub {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 470px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 21px;
+      font-weight: 500;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .s7-url {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 512px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 31px;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+    }
+    .s7-urlline {
+      position: absolute;
+      left: 50%;
+      top: 562px;
+      width: 290px;
+      height: 3px;
+      margin-left: -145px;
+      background: var(--grad);
+      transform-origin: 50% 50%;
+    }
+    .s7-quote {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 608px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 21px;
+      letter-spacing: 0.12em;
+      color: var(--ink-4);
+    }
+
+    .s7-install {
+      position: absolute;
+      left: 50%;
+      top: 676px;
+      width: 1000px;
+      margin-left: -500px;
+      border: 1px solid var(--hair);
+      background: var(--panel);
+      padding: 22px 28px;
+    }
+    .s7-install .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 14px;
+    }
+    .s7-install .head .l {
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+    }
+    .s7-install .head .r {
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      color: var(--ink-4);
+    }
+    .s7-cmdrow {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--mono);
+      font-size: 24px;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .s7-cmdrow .p {
+      color: var(--ink-3);
+    }
+    .s7-cmd {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+    }
+    .s7-cmd span {
+      display: inline-block;
+    }
+    .s7-caret {
+      display: inline-block;
+      width: 12px;
+      height: 24px;
+      background: var(--ink);
+      transform: translateY(4px);
+      margin-left: 2px;
+    }
+    .s7-slash {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--mono);
+      font-size: 20px;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      border: 1px solid var(--ink);
+      padding: 6px 12px;
+    }
+    .s7-slash .then {
+      font-size: 15px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+
+    .s7-foot {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 986px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 18px;
+      letter-spacing: 0.06em;
+      color: var(--ink-3);
+    }
+    .s7-foot .sep {
+      color: var(--ink-4);
+      margin: 0 10px;
+    }
+    .s7-foot .mit {
+      color: var(--ink-4);
+    }
+  </style>
+
+  <div id="root" data-composition-id="s7" data-width="1920" data-height="1080">
+    <div class="s7-grid" id="s7-grid"></div>
+
+    <div class="s7-glow" id="s7-glow"></div>
+    <img class="s7-mark" id="s7-mark" src="assets/img/acrylaxi-mark.png" alt="ACRYL AXI mark" />
+
+    <div class="s7-word" id="s7-word">
+      <span>A</span><span>C</span><span>R</span><span>Y</span><span>L</span><span class="sp"></span><span>A</span
+      ><span>X</span><span>I</span>
+    </div>
+    <div class="s7-sub" id="s7-sub">Agent External Interface</div>
+    <div class="s7-url" id="s7-url">acryl.dev/acrylaxi</div>
+    <div class="s7-urlline" id="s7-urlline"></div>
+    <div class="s7-quote" id="s7-quote">HTML is the new markdown.</div>
+
+    <div class="s7-install" id="s7-install">
+      <div class="head">
+        <div class="l">install</div>
+        <div class="r">any agent</div>
+      </div>
+      <div class="s7-cmdrow">
+        <span class="p">$</span>
+        <span class="s7-cmd" id="s7-cmd"><span id="s7-cmdtext">npx skills add acryldev/acrylaxi --skill acrylaxi</span></span>
+        <span class="s7-slash" id="s7-slash"><span class="then">then</span>/acrylaxi</span>
+      </div>
+    </div>
+
+    <div class="s7-foot" id="s7-foot">
+      Extended from Lavish Editor by Kun Chen<span class="sep">·</span><span class="mit">MIT</span>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+
+      /* the mark lands first, with one rainbow glow behind it */
+      tl.fromTo("#s7-glow", { opacity: 1, scale: 0.8 }, { opacity: 1, scale: 1, duration: 1.0, ease: "power2.out" }, 0);
+      tl.fromTo("#s7-mark", { opacity: 1, scale: 0.88, y: 14 }, { opacity: 1, scale: 1, y: 0, duration: 0.85, ease: "power3.out" }, 0.05);
+
+      /* the wordmark assembles letter by letter */
+      tl.fromTo(
+        "#s7-word span",
+        { opacity: 0, y: 44 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.055, ease: "power3.out" },
+        0.55,
+      );
+      tl.fromTo("#s7-sub", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 1.15);
+      tl.fromTo("#s7-url", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 1.35);
+      tl.fromTo("#s7-urlline", { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: "power2.inOut" }, 1.6);
+      tl.fromTo("#s7-quote", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.out" }, 1.75);
+
+      /* install: the command wipes in behind a caret, then the slash command lands */
+      tl.fromTo("#s7-install", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.35);
+      tl.fromTo("#s7-cmdtext", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.55, ease: "steps(46)" }, 2.6);
+      tl.fromTo("#s7-slash", { opacity: 0, x: 14 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 3.15);
+
+      tl.fromTo("#s7-foot", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 3.9);
+      tl.fromTo("#s7-grid", { opacity: 0.9 }, { opacity: 0.55, duration: 1.2, ease: "power1.inOut" }, 4.2);
+
+      /* one slow breath on the glow, so the final hold is never frozen */
+      tl.fromTo("#s7-glow", { scale: 1, opacity: 1 }, { scale: 1.06, opacity: 0.86, duration: 4.6, ease: "sine.inOut", immediateRender: false }, 5.2);
+      tl.fromTo("#s7-mark", { y: 0 }, { y: -4, duration: 4.6, ease: "sine.inOut", immediateRender: false }, 5.2);
+
+      window.__timelines["s7"] = tl;
+    })();
+  </script>
+</template>

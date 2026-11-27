@@ -12,6 +12,10 @@ import { parse } from "parse5";
 
 const projectRoot = fileURLToPath(new URL("..", import.meta.url));
 
+// Real-render regressions are opt-in: they bundle Excalidraw and drive a headless
+// Chrome, which is slow and needs a local browser. Run with ACRYLAXI_BROWSER_E2E=1.
+const runBrowserE2e = process.env.ACRYLAXI_BROWSER_E2E === "1";
+
 async function chromePath() {
   const candidates = [
     process.env.CHROME_PATH,
@@ -99,7 +103,7 @@ async function runBrowserFixture(t, fixtureName) {
     t.skip("Chrome or Chromium is required for the real-render regression");
     return null;
   }
-  const root = await mkdtemp(path.join(os.tmpdir(), "lavish-excalidraw-render-"));
+  const root = await mkdtemp(path.join(os.tmpdir(), "acrylaxi-excalidraw-render-"));
   try {
     await esbuild.build({
       entryPoints: [path.join(projectRoot, `test/fixtures/${fixtureName}.browser.jsx`)],
@@ -180,32 +184,44 @@ async function runBrowserFixture(t, fixtureName) {
   }
 }
 
-test("real Excalidraw rendering keeps loaded-font labels inside their text bounds", { timeout: 90_000 }, async (t) => {
-  const result = await runBrowserFixture(t, "excalidraw-label-clipping");
-  if (!result) return;
-  assert.equal(result.fontReady, true);
-  assert.equal(result.edgeLabels, 4);
-  assert.ok(result.multilineLines >= 2);
-  assert.ok(result.repaired >= 5);
-  assert.ok(result.opaquePixels >= 1000);
-});
+test(
+  "real Excalidraw rendering keeps loaded-font labels inside their text bounds",
+  { skip: !runBrowserE2e, timeout: 90_000 },
+  async (t) => {
+    const result = await runBrowserFixture(t, "excalidraw-label-clipping");
+    if (!result) return;
+    assert.equal(result.fontReady, true);
+    assert.equal(result.edgeLabels, 4);
+    assert.ok(result.multilineLines >= 2);
+    assert.ok(result.repaired >= 5);
+    assert.ok(result.opaquePixels >= 1000);
+  },
+);
 
-test("mounted Excalidraw autosaves prompt only after genuine edits", { timeout: 90_000 }, async (t) => {
-  const result = await runBrowserFixture(t, "excalidraw-autosave-conflict");
-  if (!result) return;
-  assert.equal(result.preMountBaselineAction, "prompt");
-  assert.equal(result.viewOnlyAction, "convert");
-  assert.equal(result.editedAction, "prompt");
-});
+test(
+  "mounted Excalidraw autosaves prompt only after genuine edits",
+  { skip: !runBrowserE2e, timeout: 90_000 },
+  async (t) => {
+    const result = await runBrowserFixture(t, "excalidraw-autosave-conflict");
+    if (!result) return;
+    assert.equal(result.preMountBaselineAction, "prompt");
+    assert.equal(result.viewOnlyAction, "convert");
+    assert.equal(result.editedAction, "prompt");
+  },
+);
 
-test("library icon nodes keep their arrows attached and panel inserts stay named", { timeout: 90_000 }, async (t) => {
-  const result = await runBrowserFixture(t, "excalidraw-library-icons");
-  if (!result) return;
-  assert.equal(result.lrNode.arrows, 3);
-  assert.equal(result.tdNode.arrows, 3);
-  assert.equal(result.lrNode.nodes, 4);
-  assert.equal(result.tdNode.nodes, 4);
-  assert.equal(result.panelItems, 1);
-  assert.equal(result.dropped, 2);
-  assert.match(result.summary, /^Added library item fixture\/Gear near \(/);
-});
+test(
+  "library icon nodes keep their arrows attached and panel inserts stay named",
+  { skip: !runBrowserE2e, timeout: 90_000 },
+  async (t) => {
+    const result = await runBrowserFixture(t, "excalidraw-library-icons");
+    if (!result) return;
+    assert.equal(result.lrNode.arrows, 3);
+    assert.equal(result.tdNode.arrows, 3);
+    assert.equal(result.lrNode.nodes, 4);
+    assert.equal(result.tdNode.nodes, 4);
+    assert.equal(result.panelItems, 1);
+    assert.equal(result.dropped, 2);
+    assert.match(result.summary, /^Added library item fixture\/Gear near \(/);
+  },
+);

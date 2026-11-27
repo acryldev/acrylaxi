@@ -1,17 +1,17 @@
 {
-  "name": "lavish-axi",
-  "version": "0.1.99",
+  "name": "acrylaxi",
+  "version": "0.1.0",
   "packageManager": "pnpm@11.1.1",
-  "description": "HTML is the new markdown. Lavish is the new editor for your HTML artifacts.",
+  "description": "HTML is the new markdown. ACRYL AXI (Agent External Interface) turns agent-generated HTML into an annotatable review surface.",
   "type": "module",
   "bin": {
-    "lavish-axi": "dist/cli.mjs"
+    "acrylaxi": "dist/cli.mjs"
   },
   "files": [
     "dist",
     "plugin.json",
-    "skills/lavish",
-    "lavish-editor-marketing/renders/lavish-editor-marketing.gif",
+    "skills/acrylaxi",
+    "marketing/renders/acrylaxi-explainer.gif",
     "LICENSE",
     "THIRD-PARTY-NOTICES.md",
     "README.md"
@@ -27,8 +27,10 @@
     "format:check": "prettier --check .",
     "prepack": "npm run build",
     "prepare": "npm run build",
-    "test": "node --test",
-    "typecheck": "tsc --noEmit"
+    "test": "node --test \"test/**/*.test.js\"",
+    "typecheck": "tsc --noEmit",
+    "upstream:status": "node scripts/pull-upstream.mjs --check",
+    "upstream:pull": "node scripts/pull-upstream.mjs --pull"
   },
   "dependencies": {
     "@tailwindcss/browser": "4.2.4",
@@ -65,17 +67,18 @@
     "cli",
     "html",
     "review",
-    "collaboration"
+    "collaboration",
+    "acryl"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kunchenguid/lavish-axi.git"
+    "url": "git+https://github.com/acryldev/acrylaxi.git"
   },
   "bugs": {
-    "url": "https://github.com/kunchenguid/lavish-axi/issues"
+    "url": "https://github.com/acryldev/acrylaxi/issues"
   },
-  "homepage": "https://github.com/kunchenguid/lavish-axi#readme",
+  "homepage": "https://github.com/acryldev/acrylaxi#readme",
   "publishConfig": {
     "access": "public"
   }

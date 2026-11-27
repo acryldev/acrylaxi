@@ -1,0 +1,423 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--paper);
+      font-family: var(--sans);
+      color: var(--ink);
+    }
+    #root *,
+    #root *::before,
+    #root *::after {
+      box-sizing: border-box;
+    }
+
+    .s5-chrome {
+      position: absolute;
+      top: 92px;
+      left: 120px;
+      right: 120px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .s5-chrome .right {
+      font-family: var(--mono);
+      font-size: 17px;
+      letter-spacing: 0.14em;
+      color: var(--ink-4);
+      text-transform: uppercase;
+    }
+
+    .s5-head {
+      position: absolute;
+      left: 120px;
+      top: 156px;
+      font-size: 66px;
+      font-weight: 500;
+      letter-spacing: -0.042em;
+      line-height: 1.1;
+      color: var(--ink);
+      display: flex;
+      gap: 0.24em;
+      white-space: nowrap;
+    }
+    .s5-clause {
+      display: inline-block;
+    }
+
+    .s5-cols {
+      position: absolute;
+      left: 120px;
+      top: 360px;
+      width: 1680px;
+      display: grid;
+      grid-template-columns: 520px 520px 520px;
+      column-gap: 60px;
+    }
+    .s5-col {
+      position: relative;
+    }
+    .s5-index {
+      font-family: var(--mono);
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      color: var(--ink-4);
+      margin-bottom: 14px;
+    }
+    .s5-kick {
+      font-family: var(--mono);
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 16px;
+    }
+    .s5-h {
+      position: relative;
+      display: inline-block;
+      font-size: 40px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      margin: 0 0 14px 0;
+    }
+    .s5-ul {
+      position: absolute;
+      left: 0;
+      bottom: -9px;
+      width: 100%;
+      height: 3px;
+      background: var(--grad);
+      transform-origin: 0% 50%;
+      opacity: 0.9;
+    }
+    .s5-body {
+      font-size: 24px;
+      line-height: 1.45;
+      color: var(--ink-3);
+      letter-spacing: -0.006em;
+      margin: 0 0 30px 0;
+      max-width: 500px;
+      min-height: 142px;
+    }
+
+    .s5-rule {
+      position: absolute;
+      top: 356px;
+      width: 1px;
+      height: 424px;
+      background: var(--hair);
+      transform-origin: 50% 0%;
+    }
+    .s5-rule.r1 {
+      left: 680px;
+    }
+    .s5-rule.r2 {
+      left: 1260px;
+    }
+
+    /* col 1 visual: the screenshot, discarded */
+    .s5-shot {
+      position: relative;
+      width: 260px;
+      height: 172px;
+      border: 1px solid var(--hair);
+      background: #fbfbfa;
+      overflow: hidden;
+    }
+    .s5-shot .bar {
+      height: 18px;
+      background: #eeedea;
+      border-bottom: 1px solid var(--hair-soft);
+    }
+    .s5-shot .rows {
+      padding: 14px;
+    }
+    .s5-shot .row {
+      height: 8px;
+      background: #e6e5e1;
+      margin-bottom: 7px;
+    }
+    .s5-shot .row.w1 {
+      width: 76%;
+    }
+    .s5-shot .row.w2 {
+      width: 52%;
+    }
+    .s5-shot .strike {
+      position: absolute;
+      left: -10px;
+      top: 86px;
+      width: 292px;
+      height: 2px;
+      background: var(--ink);
+      transform-origin: 0% 50%;
+    }
+    .s5-shot .lab {
+      position: absolute;
+      right: 8px;
+      bottom: 6px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--ink-4);
+    }
+    .s5-visual1 {
+      display: flex;
+      align-items: flex-start;
+      gap: 26px;
+    }
+    .s5-chip {
+      border: 1px solid var(--hair);
+      background: var(--panel);
+      padding: 12px 14px;
+      width: 292px;
+    }
+    .s5-chip .a {
+      font-family: var(--mono);
+      font-size: 15px;
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+      color: var(--ink-3);
+      margin-bottom: 8px;
+    }
+    .s5-chip .t {
+      font-size: 22px;
+      line-height: 1.3;
+      color: var(--ink);
+    }
+    .s5-chip .ok {
+      margin-top: 10px;
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+
+    /* col 2 visual: local state */
+    .s5-path {
+      font-family: var(--mono);
+      font-size: 34px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      border-bottom: 1px solid var(--hair);
+      padding-bottom: 12px;
+      margin-bottom: 4px;
+    }
+    .s5-tree {
+      font-family: var(--mono);
+      font-size: 18px;
+      line-height: 2.1;
+      color: var(--ink-3);
+    }
+    .s5-tree b {
+      font-weight: 500;
+      color: var(--ink-2);
+    }
+    .s5-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 16px;
+      border: 1px solid var(--hair);
+      padding: 7px 11px;
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-2);
+    }
+    .s5-tag .d {
+      width: 7px;
+      height: 7px;
+      background: var(--ink);
+    }
+
+    /* col 3 visual: agent list */
+    .s5-agents {
+      border-top: 1px solid var(--hair);
+    }
+    .s5-agent {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--hair-soft);
+      padding: 12px 0;
+      font-family: var(--mono);
+      font-size: 20px;
+      letter-spacing: 0.02em;
+      color: var(--ink-2);
+    }
+    .s5-agent .tick {
+      width: 18px;
+      height: 18px;
+      opacity: 0;
+    }
+
+    /* closing line */
+    .s5-close {
+      position: absolute;
+      left: 120px;
+      top: 940px;
+      display: flex;
+      align-items: baseline;
+      gap: 22px;
+    }
+    .s5-close .eyebrow {
+      font-size: 17px;
+    }
+    .s5-close .big {
+      font-size: 40px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+  </style>
+
+  <div id="root" data-composition-id="s5" data-width="1920" data-height="1080">
+    <div class="grid-surface"></div>
+
+    <div class="s5-chrome">
+      <div class="eyebrow">Why it holds up</div>
+      <div class="right">three reasons</div>
+    </div>
+
+    <h2 class="s5-head" id="s5-head">
+      <span class="s5-clause">No screenshots.</span>
+      <span class="s5-clause">No cloud.</span>
+      <span class="s5-clause">No new agent.</span>
+    </h2>
+
+    <div class="s5-rule r1" id="s5-rule1"></div>
+    <div class="s5-rule r2" id="s5-rule2"></div>
+
+    <div class="s5-cols">
+      <div class="s5-col" id="s5-c1">
+        <div class="s5-index">01</div>
+        <div class="s5-kick">No screenshots</div>
+        <h3 class="s5-h">Feedback is text.<span class="s5-ul" id="s5-ul1"></span></h3>
+        <p class="s5-body">Point at an element, select a sentence, queue a fix. The agent gets selectors and anchors — a paragraph, not five screenshots.</p>
+        <div class="s5-visual1">
+          <div class="s5-shot">
+            <div class="bar"></div>
+            <div class="rows">
+              <div class="row"></div>
+              <div class="row w1"></div>
+              <div class="row"></div>
+              <div class="row w2"></div>
+            </div>
+            <div class="strike" id="s5-strike"></div>
+            <div class="lab">screenshot.png</div>
+          </div>
+          <div class="s5-chip" id="s5-chip">
+            <div class="a">element · #pricing-card</div>
+            <div class="t">“make it taller”</div>
+            <div class="ok">→ selector + words</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="s5-col" id="s5-c2">
+        <div class="s5-index">02</div>
+        <div class="s5-kick">Local-first</div>
+        <h3 class="s5-h">Nothing leaves.<span class="s5-ul" id="s5-ul2"></span></h3>
+        <p class="s5-body">The surface is a local page on a local port, and review state lives on disk. No upload, no account, no screenshot parsing.</p>
+        <div class="s5-path">~/.acrylaxi/</div>
+        <div class="s5-tree" id="s5-tree">
+          <div>├─ <b>plan.html</b> · the artifact</div>
+          <div>├─ <b>reviews/</b> · prompts, anchors</div>
+          <div>└─ <b>sessions/</b> · revisions r1 → r3</div>
+        </div>
+        <div class="s5-tag" id="s5-tag"><span class="d"></span>local port · offline-capable</div>
+      </div>
+
+      <div class="s5-col" id="s5-c3">
+        <div class="s5-index">03</div>
+        <div class="s5-kick">Any agent</div>
+        <h3 class="s5-h">Whatever writes HTML.<span class="s5-ul" id="s5-ul3"></span></h3>
+        <p class="s5-body">If an agent can write a file and read text, it can run the loop. Nothing to port, nothing to wrap.</p>
+        <div class="s5-agents" id="s5-agents">
+          <div class="s5-agent">
+            <span>Claude Code</span>
+            <svg class="tick" viewBox="0 0 18 18" fill="none"><path d="M2 9.5 L6.6 14 L16 3.5" stroke="#171717" stroke-width="1.6" /></svg>
+          </div>
+          <div class="s5-agent">
+            <span>Codex</span>
+            <svg class="tick" viewBox="0 0 18 18" fill="none"><path d="M2 9.5 L6.6 14 L16 3.5" stroke="#171717" stroke-width="1.6" /></svg>
+          </div>
+          <div class="s5-agent">
+            <span>OpenCode</span>
+            <svg class="tick" viewBox="0 0 18 18" fill="none"><path d="M2 9.5 L6.6 14 L16 3.5" stroke="#171717" stroke-width="1.6" /></svg>
+          </div>
+          <div class="s5-agent">
+            <span>GitHub Copilot CLI</span>
+            <svg class="tick" viewBox="0 0 18 18" fill="none"><path d="M2 9.5 L6.6 14 L16 3.5" stroke="#171717" stroke-width="1.6" /></svg>
+          </div>
+          <div class="s5-agent">
+            <span>DSH / ACRYL agents</span>
+            <svg class="tick" viewBox="0 0 18 18" fill="none"><path d="M2 9.5 L6.6 14 L16 3.5" stroke="#171717" stroke-width="1.6" /></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="clip s5-close" id="s5-close" data-start="6.4" data-duration="4.1">
+      <div class="eyebrow">Same loop</div>
+      <div class="big" id="s5-closeline">No pixels to interpret.</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo(".s5-chrome .eyebrow", { opacity: 1, x: -14 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0);
+      tl.fromTo(".s5-chrome .right", { opacity: 1 }, { opacity: 1, duration: 0.5 }, 0.15);
+
+      tl.fromTo(
+        ".s5-clause",
+        { opacity: 1, y: 34 },
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.14, ease: "power3.out" },
+        0.1,
+      );
+
+      tl.fromTo(
+        [".s5-rule.r1", ".s5-rule.r2"],
+        { scaleY: 0, opacity: 0 },
+        { scaleY: 1, opacity: 1, duration: 0.7, stagger: 0.1, ease: "power2.inOut" },
+        0.85,
+      );
+      tl.fromTo(["#s5-c1", "#s5-c2", "#s5-c3"], { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.55, stagger: 0.13, ease: "power3.out" }, 0.9);
+
+      // 01 — the screenshot gets struck out, the selector replaces it
+      tl.fromTo("#s5-strike", { scaleX: 0 }, { scaleX: 1, duration: 0.42, ease: "power3.inOut" }, 1.75);
+      tl.fromTo("#s5-chip", { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, 2.05);
+      tl.fromTo("#s5-ul1", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.inOut" }, 2.25);
+
+      // 02 — the local tree lands
+      tl.fromTo("#s5-tree > div", { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.32, stagger: 0.16, ease: "power2.out" }, 2.55);
+      tl.fromTo("#s5-tag", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 3.2);
+      tl.fromTo("#s5-ul2", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.inOut" }, 3.85);
+
+      // 03 — the agent list ticks in
+      tl.fromTo(".s5-agent", { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.32, stagger: 0.11, ease: "power2.out" }, 4.15);
+      tl.fromTo(".s5-agent .tick", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.26, stagger: 0.11, ease: "back.out(2.4)" }, 4.45);
+      tl.fromTo("#s5-ul3", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.inOut" }, 5.45);
+
+      // the closing line, then a small settle so the frame never sits still
+      tl.fromTo("#s5-close", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 6.4);
+      tl.fromTo(".s5-cols", { y: 0 }, { y: -10, duration: 1.2, ease: "power2.inOut" }, 7.6);
+      tl.to(".s5-head", { opacity: 0.72, duration: 1.0, ease: "power2.inOut" }, 7.6);
+      tl.fromTo("#s5-closeline", { opacity: 0.55 }, { opacity: 1, duration: 1.1, ease: "power2.inOut" }, 8.2);
+
+      window.__timelines["s5"] = tl;
+    })();
+  </script>
+</template>

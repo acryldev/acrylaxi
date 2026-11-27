@@ -1,0 +1,31 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/hyperframes.json",
+  "registry": "https://raw.githubusercontent.com/heygen-com/hyperframes/main/registry",
+  "paths": {
+    "blocks": "compositions",
+    "components": "compositions/components",
+    "assets": "assets"
+  },
+  "registryItems": [
+    {
+      "name": "browser-device-stage",
+      "type": "hyperframes:component",
+      "target": "compositions/components/browser-device-stage.html"
+    },
+    {
+      "name": "cursor-text-select",
+      "type": "hyperframes:component",
+      "target": "compositions/components/cursor-text-select.html"
+    },
+    {
+      "name": "code-terminal-run",
+      "type": "hyperframes:component",
+      "target": "compositions/components/code-terminal-run.html"
+    },
+    {
+      "name": "whiteboard-ink",
+      "type": "hyperframes:component",
+      "target": "compositions/components/whiteboard-ink.html"
+    }
+  ]
+}
