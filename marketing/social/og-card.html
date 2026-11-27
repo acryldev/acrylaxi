@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#f9fafb;color:#1c1f24}
+  .card{position:relative;width:1200px;height:630px;padding:54px 60px;display:grid;grid-template-rows:auto 1fr auto;gap:22px;overflow:hidden;
+    background-image:linear-gradient(to right,rgba(28,31,36,.07) 1px,transparent 1px),linear-gradient(to bottom,rgba(28,31,36,.07) 1px,transparent 1px);background-size:60px 60px}
+  .top{display:flex;align-items:center;gap:14px}
+  .mark{width:64px;height:64px}
+  .eyebrow{margin:0;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#5b6470}
+  h1{margin:0;font-family:Manrope,sans-serif;font-weight:800;font-size:58px;line-height:.98;letter-spacing:-.045em;max-width:760px}
+  h1 em{font-style:normal;font-weight:400}
+  .lede{margin:0;font-family:Manrope,sans-serif;font-size:20px;line-height:1.45;color:#4a525c;max-width:600px}
+  .bottom{display:flex;align-items:center;gap:22px;border-top:1px solid rgba(28,31,36,.18);padding-top:18px;max-width:640px}
+  .cmd{font-family:'DM Mono',monospace;font-size:17px;color:#1c1f24;background:#eef0f2;border:1px solid rgba(28,31,36,.18);padding:10px 14px}
+  .cmd b{color:#16a2b8;font-weight:500}
+  .url{font-family:'DM Mono',monospace;font-size:17px;color:#1c1f24}
+  .shot{position:absolute;right:26px;bottom:34px;width:470px;border:1px solid rgba(28,31,36,.22);box-shadow:0 30px 70px -35px rgba(28,31,36,.5);transform:rotate(-1deg)}
+  .glow{position:absolute;right:150px;top:10px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(0,190,220,.14),rgba(160,90,255,.10) 45%,rgba(255,190,60,.09) 70%,transparent 72%)}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="glow"></div>
+    <div class="top">
+      <img class="mark" src="../../../assets/img/acrylaxi-mark.png" alt="" />
+      <p class="eyebrow">ACRYL AXI · Agent External Interface</p>
+    </div>
+    <div>
+      <h1>HTML is the new markdown.<br /><em>Review it like a<br />document.</em></h1>
+      <p class="lede" style="margin-top:18px">Annotate elements, select text, redraw diagrams, queue fixes. Feedback reaches the agent as text with exact anchors — no screenshots.</p>
+    </div>
+    <div class="bottom">
+      <div class="cmd"><b>$</b> npx skills add acryldev/acrylaxi</div>
+      <div class="url">acryl.dev/acrylaxi</div>
+    </div>
+    <img class="shot" src="https://acryl.dev/acrylaxi/media/review.png" alt="" />
+  </div>
+</body>
+</html>

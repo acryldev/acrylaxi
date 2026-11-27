@@ -12,4 +12,6 @@ package-lock.json
 /.planning/
 # HyperFrames working state (rendered deliverables in marketing/renders are kept)
 marketing/.hyperframes/
+marketing/**/.hyperframes/
 marketing/node_modules/
+marketing/**/node_modules/
