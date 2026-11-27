@@ -18,6 +18,8 @@
   <img alt="Acrylaxi demo" src="marketing/renders/acrylaxi-explainer.gif" width="960" />
 </p>
 
+<p align="center"><sub>Real states of the running review surface: <a href="marketing/screenshots/README.md">screenshots</a> · <a href="marketing/README.md">explainer project</a></sub></p>
+
 ## What it is
 
 An agent asked to "show me the plan" answers with prose, a pasted table, or a screenshot. Prose is hard to point at. A screenshot cannot be sent back as an edit. HTML is the format that can carry the answer, but nothing closes the loop between the page and the agent that wrote it.
