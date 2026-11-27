@@ -106,10 +106,13 @@ Codex and ChatGPT install plugins only from marketplace sources, so Codex users 
 ```sh
 git clone https://github.com/acryldev/acrylaxi.git
 cd acrylaxi
-pnpm install --frozen-lockfile
-pnpm run build
-pnpm link
+corepack pnpm install --frozen-lockfile
+npm i -g .
 ```
+
+`pnpm install` builds `dist/` through the package's `prepare` script, so the global install of
+the checkout has a working `acrylaxi` binary. Rebuild with `pnpm run build`; the npm global entry
+is a symlink to the checkout, so the binary picks the rebuild up.
 
 ## The loop
 
