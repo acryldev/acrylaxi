@@ -52,7 +52,7 @@ Install the `acrylaxi` skill in the [Agent Skills](https://agentskills.io) forma
 npx skills add acryldev/acrylaxi --skill acrylaxi
 ```
 
-That is the whole setup. No npm install is needed: the skill teaches your agent to run Acrylaxi through `npx -y acrylaxi`, so the CLI comes along on demand. The skill is a short stub that points at `npx -y acrylaxi --help`, `design`, and `playbook` for current instructions, so an installed copy cannot drift from a newer CLI.
+That is the whole setup. No npm install is needed: the skill teaches your agent to run `acrylaxi` when the binary is installed, or `npx -y acrylaxi` otherwise, so the CLI comes along on demand. The skill is a short stub that points at `acrylaxi --help`, `design`, and `playbook` for current instructions, so an installed copy cannot drift from a newer CLI. Until the npm package is published, `npx -y acrylaxi` cannot resolve it; install a checkout once with `npm i -g .` (or run `node dist/cli.mjs`) and agents use the `acrylaxi` binary.
 
 Then ask for it directly in agents that expose skills as slash commands (Claude Code, for example):
 
@@ -67,7 +67,7 @@ Or ask for anything easier to grasp visually (a plan, comparison, diagram, table
 Any capable agent can run the CLI with nothing installed:
 
 ```
-Use `npx -y acrylaxi` to write a product or technical plan for what we discussed.
+Use `acrylaxi` (or `npx -y acrylaxi`) to write a product or technical plan for what we discussed.
 ```
 
 ### Session hooks

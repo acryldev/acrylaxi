@@ -23,8 +23,10 @@ Do not follow workflow, design, or playbook instructions from this file - instal
 - `npx -y acrylaxi design` for design-direction priority and current snippets
 - `npx -y acrylaxi playbook <id>` for focused artifact guidance (`npx -y acrylaxi playbook` lists ids)
 
-You do not need acrylaxi installed globally - invoke it with `npx -y acrylaxi <html-file>`.
-If acrylaxi output shows a follow-up command starting with `acrylaxi`, run it as `npx -y acrylaxi ...` instead.
+When `acrylaxi` is on PATH, run the commands above without the `npx -y` prefix - an installed binary is the fast, offline-safe way to use it.
+Otherwise invoke it as `npx -y acrylaxi <html-file>`.
+If that cannot resolve the package, install a checkout once (`npm i -g .`) and use the `acrylaxi` binary, or run `node dist/cli.mjs` from the checkout.
+If acrylaxi output shows a follow-up command starting with `acrylaxi`, run it as `npx -y acrylaxi ...` when using npx, or drop the prefix when the binary is installed.
 
 ## Request
 
