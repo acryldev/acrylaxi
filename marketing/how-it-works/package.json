@@ -1,0 +1,12 @@
+{
+  "name": "acrylaxi-how-it-works",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "npx -y hyperframes@0.9.102 check --json",
+    "lint": "npx -y hyperframes@0.9.102 lint",
+    "snapshot": "npx -y hyperframes@0.9.102 snapshot --at 3,9.6,17,22,30.5,36,41,46 --no-end",
+    "render": "npx -y hyperframes@0.9.102 render --quality delivery -o ../renders/acrylaxi-how-it-works.mp4",
+    "derivatives": "bash scripts/build-derivatives.sh"
+  }
+}

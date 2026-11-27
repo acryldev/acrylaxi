@@ -1,0 +1,252 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: var(--sans);
+      color: var(--fg);
+    }
+
+    /* ── shared film chrome ─────────────────────────────────────── */
+    .topline {
+      position: absolute;
+      top: 52px;
+      left: 120px;
+      right: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      font-size: 15px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--fg);
+      white-space: nowrap;
+    }
+    .brand span {
+      color: var(--muted);
+    }
+    .rail {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .rail i {
+      width: 18px;
+      height: 2px;
+      background: var(--line);
+    }
+    .rail i.past {
+      background: var(--muted);
+    }
+    .rail i.on {
+      background: var(--accent);
+    }
+
+    /* ── caption ────────────────────────────────────────────────── */
+    /* ── terminal card ──────────────────────────────────────────── */
+    .term {
+      position: absolute;
+      left: 120px;
+      top: 322px;
+      width: 1000px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      box-shadow: 0 30px 90px -40px rgba(0, 0, 0, 0.9);
+    }
+    .term-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .term-head .l {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .term-head .l b {
+      font-weight: 500;
+      color: var(--fg-2);
+    }
+    .term-body {
+      padding: 22px 22px 26px 22px;
+      display: flex;
+      align-items: baseline;
+      font-family: var(--mono);
+      font-size: 26px;
+      white-space: nowrap;
+    }
+    .term-body .p {
+      color: var(--accent);
+      margin-right: 14px;
+      font-size: 26px;
+    }
+    .ch {
+      display: inline-block;
+      width: 15.6px;
+      text-align: center;
+      opacity: 0;
+      color: var(--fg);
+    }
+    .car {
+      display: inline-block;
+      width: 13px;
+      height: 26px;
+      background: var(--accent);
+      transform: translateY(5px);
+      margin-left: 2px;
+    }
+
+    /* ── the gate over the product ──────────────────────────────── */
+    .scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 11, 13, 0.62);
+    }
+    .gate-wrap {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 900px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gate {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 22px 30px;
+      background: rgba(16, 18, 22, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .gate .label {
+      font-family: var(--mono);
+      font-size: 21px;
+      letter-spacing: 0.02em;
+      color: var(--fg);
+    }
+    .gate .dots {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+    .gate .dots i {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+  </style>
+
+  <div id="root" data-composition-id="h1" data-width="1920" data-height="1080">
+    <div class="grid-surface"></div>
+
+    <div class="topline">
+      <div class="brand mono">ACRYL AXI <span>· how a round works</span></div>
+      <div class="rail">
+        <i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+    </div>
+
+    <!-- the product surface: the real review window -->
+    <div class="clip stage" id="h1-stage" data-start="2.05" data-duration="3.45">
+      <div class="surface">
+        <img class="shot" src="assets/media/review.png" alt="" />
+        <div class="scrim" id="h1-scrim"></div>
+        <div class="gate-wrap">
+          <div class="gate" id="h1-gate">
+            <span class="label">Checking layout</span>
+            <span class="dots"><i></i><i></i><i></i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- the command that opens it -->
+    <div class="clip term" id="h1-term" data-start="0" data-duration="2.5">
+      <div class="term-head">
+        <div class="l"><b>acrylaxi</b> · local</div>
+        <div class="l">zsh</div>
+      </div>
+      <div class="term-body">
+        <span class="p">$</span>
+        <span id="h1-cmd"
+          ><span class="ch">a</span><span class="ch">c</span><span class="ch">r</span><span class="ch">y</span
+          ><span class="ch">l</span><span class="ch">a</span><span class="ch">x</span><span class="ch">i</span
+          ><span class="ch">&nbsp;</span><span class="ch">e</span><span class="ch">x</span><span class="ch">a</span
+          ><span class="ch">m</span><span class="ch">p</span><span class="ch">l</span><span class="ch">e</span
+          ><span class="ch">s</span><span class="ch">/</span><span class="ch">a</span><span class="ch">c</span
+          ><span class="ch">r</span><span class="ch">y</span><span class="ch">l</span><span class="ch">a</span
+          ><span class="ch">x</span><span class="ch">i</span><span class="ch">-</span><span class="ch">d</span
+          ><span class="ch">e</span><span class="ch">m</span><span class="ch">o</span><span class="ch">.</span
+          ><span class="ch">h</span><span class="ch">t</span><span class="ch">m</span><span class="ch">l</span></span
+        ><span class="car" id="h1-car"></span>
+      </div>
+    </div>
+
+    <div class="clip capband" id="h1-band" data-start="3.0" data-duration="2.5">
+      <div class="cap">
+        <div class="eyebrow" id="h1-eyebrow">01 · open</div>
+        <div class="cap-line" id="h1-line">One HTML file, opened <em>locally</em>.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const HOME = { x: 312, y: 96, scale: 0.9 };
+      const CH = gsap.utils.toArray(".ch");
+
+      tl.set("#h1-stage", { x: HOME.x, y: HOME.y, scale: HOME.scale }, 0);
+      tl.set(".topline", { opacity: 1 }, 0);
+
+      // command types, caret rides along
+      // six characters are already on screen at frame 0
+      CH.forEach(function (el, i) {
+        if (i < 6) tl.set(el, { opacity: 1 }, 0);
+        else tl.set(el, { opacity: 1 }, 0.35 + (i - 6) * 0.034);
+      });
+      tl.set("#h1-car", { x: 6 * 15.6 }, 0);
+      tl.fromTo("#h1-car", { x: 6 * 15.6 }, { x: CH.length * 15.6, duration: (CH.length - 6) * 0.034, ease: "none" }, 0.35);
+      tl.to("#h1-car", { opacity: 0, duration: 0.12, repeat: 1, yoyo: true, ease: "none" }, 1.95);
+      tl.set("#h1-car", { opacity: 0 }, 2.4);
+
+      tl.fromTo("#h1-term", { opacity: 1, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0);
+      tl.to("#h1-term", { opacity: 0, y: -14, duration: 0.4, ease: "power2.in" }, 2.1);
+
+      // the window lands, then the gate clears
+      tl.fromTo("#h1-stage", { opacity: 0, scale: 0.8, y: HOME.y + 26 }, { opacity: 1, scale: HOME.scale, y: HOME.y, duration: 0.7, ease: "power3.out" }, 2.05);
+      tl.fromTo("#h1-scrim", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 2.2);
+      tl.fromTo("#h1-gate", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 2.25);
+      tl.fromTo(
+        "#h1-gate .dots i",
+        { opacity: 0.25 },
+        { opacity: 1, duration: 0.22, stagger: 0.12, repeat: 2, yoyo: true, ease: "sine.inOut" },
+        2.5,
+      );
+      tl.to("#h1-gate", { opacity: 0, duration: 0.22, ease: "power2.in" }, 3.05);
+      tl.to("#h1-scrim", { opacity: 0, duration: 0.45, ease: "power2.inOut" }, 3.08);
+
+      // caption + a slow drift so the shot never sits still
+      tl.fromTo("#h1-band", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.out" }, 3.0);
+      tl.fromTo("#h1-eyebrow", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 3.05);
+      tl.fromTo("#h1-line", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 3.12);
+      tl.fromTo("#h1-stage", { scale: HOME.scale }, { scale: 0.915, duration: 2.2, ease: "sine.inOut" }, 3.3);
+
+      window.__timelines["h1"] = tl;
+    })();
+  </script>
+</template>

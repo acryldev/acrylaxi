@@ -1,0 +1,276 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: var(--sans);
+      color: var(--fg);
+    }
+
+    /* conversation panel, cropped out of the real review window */
+    .pcard {
+      position: absolute;
+      left: 120px;
+      top: 88px;
+      width: 510px;
+      height: 653px;
+      overflow: hidden;
+      box-shadow: 0 40px 120px -30px rgba(0, 0, 0, 0.85);
+    }
+    .inner {
+      position: absolute;
+      left: -1535px;
+      top: -85.2px;
+      width: 1440px;
+      height: 900px;
+      transform: scale(1.42);
+      transform-origin: 0 0;
+      background-image: url("assets/media/review.png");
+      background-size: 1440px 900px;
+      background-position: 0 0;
+      background-repeat: no-repeat;
+    }
+    .patch {
+      position: absolute;
+    }
+    .layer {
+      position: absolute;
+      inset: 0;
+      background-image: url("assets/media/review.png");
+      background-size: 1440px 900px;
+      background-position: 0 0;
+      background-repeat: no-repeat;
+    }
+    .ring {
+      position: absolute;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+    }
+    .rline {
+      position: absolute;
+      left: 120px;
+      top: 766px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .rline b {
+      font-weight: 400;
+      color: var(--line);
+    }
+    .rline span.lit {
+      color: var(--fg);
+    }
+
+    /* the agent side */
+    .term {
+      position: absolute;
+      left: 700px;
+      top: 120px;
+      width: 1100px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      box-shadow: 0 30px 90px -40px rgba(0, 0, 0, 0.9);
+    }
+    .term-head {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line-soft);
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .term-head b {
+      font-weight: 500;
+      color: var(--fg-2);
+    }
+    .term-body {
+      display: flex;
+      flex-direction: column;
+      min-height: 571px;
+      padding: 34px 28px 28px 28px;
+      font-family: var(--mono);
+      font-size: 21px;
+      line-height: 2.1;
+      white-space: nowrap;
+    }
+    .cmd {
+      font-size: 25px;
+      color: var(--fg);
+      margin-bottom: 18px;
+    }
+    .foot {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--line-soft);
+      font-size: 17px;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .cmd .p {
+      color: var(--accent);
+      margin-right: 12px;
+    }
+    .ch {
+      display: inline-block;
+      width: 13.2px;
+      text-align: center;
+      opacity: 0;
+      color: var(--fg);
+    }
+    .car {
+      display: inline-block;
+      width: 11px;
+      height: 22px;
+      background: var(--accent);
+      transform: translateY(4px);
+      margin-left: 2px;
+    }
+    .tl {
+      color: var(--muted);
+    }
+    .tl .k {
+      color: var(--muted);
+    }
+    .tl .v {
+      color: var(--fg);
+    }
+    .tl .a {
+      color: var(--amber);
+    }
+
+    .cursor {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 30px;
+      z-index: 8;
+    }
+    .cursor svg {
+      display: block;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
+    }
+    .ripple {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 54px;
+      height: 54px;
+      margin: -27px 0 0 -27px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      z-index: 7;
+    }
+  </style>
+
+  <div id="root" data-composition-id="h3" data-width="1920" data-height="1080">
+    <div class="grid-surface"></div>
+
+    <div class="topline">
+      <div class="brand mono">ACRYL AXI <span>· how a round works</span></div>
+      <div class="rail"><i class="past"></i><i class="past"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
+    </div>
+
+    <!-- left: the real conversation, with the prompt already in it -->
+    <div class="clip" id="h3-panel" data-start="0" data-duration="9.5" style="position: absolute; inset: 0">
+      <div class="pcard" id="h3-pcard">
+        <div class="inner">
+          <div class="patch" style="left: 1140px; top: 362px; width: 240px; height: 114px; background: #11141a"></div>
+          <div class="layer" id="h3-reply" style="clip-path: inset(366px 64px 428px 1144px)"></div>
+        </div>
+        <span class="ring" id="h3-r1" style="left: 360px; top: 217px; width: 42px; height: 38px"></span>
+        <span class="ring" id="h3-r2" style="left: 402px; top: 217px; width: 44px; height: 38px"></span>
+        <span class="ring" id="h3-r3" style="left: 446px; top: 217px; width: 38px; height: 38px"></span>
+      </div>
+
+      <div class="rline">
+        <span id="h3-l1">seen</span><b>→</b><span id="h3-l2">working</span><b>→</b><span id="h3-l3">done</span>
+      </div>
+    </div>
+
+    <!-- right: the CLI returns text -->
+    <div class="clip term" id="h3-term" data-start="0.3" data-duration="9.2">
+      <div class="term-head">
+        <div><b>acrylaxi</b> · poll</div>
+        <div>returns text</div>
+      </div>
+      <div class="term-body">
+        <div class="cmd"><span class="p">$</span><span id="h3-cmdtext"><span class="ch">a</span><span class="ch">c</span><span class="ch">r</span><span class="ch">y</span><span class="ch">l</span><span class="ch">a</span><span class="ch">x</span><span class="ch">i</span><span class="ch">&nbsp;</span><span class="ch">p</span><span class="ch">o</span><span class="ch">l</span><span class="ch">l</span><span class="ch">&nbsp;</span><span class="ch">p</span><span class="ch">l</span><span class="ch">a</span><span class="ch">n</span><span class="ch">.</span><span class="ch">h</span><span class="ch">t</span><span class="ch">m</span><span class="ch">l</span></span><span class="car" id="h3-car"></span></div>
+        <div class="tl" id="h3-t1" style="opacity: 0"><span class="k">waiting for review</span> <span class="a">…</span></div>
+        <div class="tl" id="h3-t2" style="opacity: 0"><span class="k">status:</span> <span class="v">feedback</span></div>
+        <div class="tl" id="h3-t3" style="opacity: 0"><span class="k">prompts[1]{uid,prompt,selector,tag,text}:</span></div>
+        <div class="tl" id="h3-t4" style="opacity: 0; white-space: normal">
+          <span class="v">9f2c</span>, <span class="a">"Lead with the cost…"</span>, <span class="v">"&lt;p&gt;"</span>,
+          <span class="v">p</span>, <span class="v">"This page is a plain HTML file…"</span>
+        </div>
+        <div class="foot" id="h3-t5" style="opacity: 0">1 prompt · text only · no images</div>
+      </div>
+    </div>
+
+    <div class="clip capband" id="h3-band" data-start="0" data-duration="9.5">
+      <div class="cap">
+        <div class="eyebrow" id="h3-eyebrow">03 · poll</div>
+        <div class="cap-line" id="h3-line">Text back, not <em>screenshots</em>.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const CMD = "acrylaxi poll plan.html";
+
+      tl.fromTo("#h3-band", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+      tl.fromTo("#h3-eyebrow", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.05);
+      tl.fromTo("#h3-line", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 0.12);
+
+      tl.fromTo("#h3-panel", { opacity: 1, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0);
+      tl.fromTo("#h3-term", { opacity: 1, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.12);
+
+      // the command, then the return value
+      const CH3 = gsap.utils.toArray("#h3-cmdtext .ch");
+      CH3.forEach(function (el, i) {
+        tl.set(el, { opacity: 1 }, 0.55 + i * 0.03);
+      });
+      tl.fromTo("#h3-car", { x: 0 }, { x: CH3.length * 13.2, duration: CH3.length * 0.03, ease: "none" }, 0.55);
+      tl.to("#h3-car", { opacity: 0, duration: 0.12, repeat: 1, yoyo: true, ease: "none" }, 1.3);
+      tl.set("#h3-car", { opacity: 0 }, 1.6);
+      tl.set("#h3-t1", { opacity: 1 }, 1.4);
+      tl.set("#h3-t2", { opacity: 1 }, 1.9);
+      tl.set("#h3-t3", { opacity: 1 }, 2.3);
+      tl.fromTo("#h3-t4", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 2.7);
+      tl.fromTo("#h3-t5", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 3.2);
+
+      // receipts on the bubble light in order
+      tl.fromTo("#h3-r1", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 4.2);
+      tl.set("#h3-l1", { className: "lit" }, 4.2);
+      tl.fromTo("#h3-r2", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 4.7);
+      tl.set("#h3-l2", { className: "lit" }, 4.7);
+      tl.fromTo("#h3-r3", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 5.2);
+      tl.set("#h3-l3", { className: "lit" }, 5.2);
+
+      // the agent answers
+      tl.fromTo("#h3-reply", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 5.7);
+
+      // a slow drift on both cards keeps the frame alive
+      tl.fromTo("#h3-pcard", { y: 0 }, { y: -8, duration: 3.0, ease: "sine.inOut" }, 6.2);
+      tl.fromTo("#h3-term", { y: 0 }, { y: -6, duration: 3.0, ease: "sine.inOut", immediateRender: false }, 6.3);
+
+      window.__timelines["h3"] = tl;
+    })();
+  </script>
+</template>

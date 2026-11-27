@@ -1,0 +1,217 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: var(--sans);
+      color: var(--fg);
+    }
+
+    /* the edit the agent made */
+    .file {
+      position: absolute;
+      left: 120px;
+      top: 150px;
+      width: 720px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      box-shadow: 0 30px 90px -40px rgba(0, 0, 0, 0.9);
+    }
+    .file-head {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line-soft);
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .file-head b {
+      font-weight: 500;
+      color: var(--fg-2);
+    }
+    .file-head .r2 {
+      color: var(--accent);
+    }
+    .file-body {
+      padding: 20px 20px 8px 20px;
+      font-family: var(--mono);
+      font-size: 16px;
+      line-height: 2.1;
+      white-space: nowrap;
+    }
+    .dl {
+      color: var(--muted);
+      opacity: 0;
+    }
+    .dl.add {
+      color: var(--fg);
+    }
+    .dl.add .m {
+      color: var(--accent);
+      margin-right: 9px;
+    }
+    .dl.chg {
+      color: var(--fg-2);
+    }
+    .dl.chg .m {
+      color: var(--amber);
+      margin-right: 9px;
+    }
+    .dl .cm {
+      color: #5c6168;
+    }
+    .file-foot {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 4px 20px 18px 20px;
+      font-family: var(--mono);
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .file-foot i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* the real revisions popover, whole */
+    .revbox {
+      position: absolute;
+      left: 960px;
+      top: 150px;
+      width: 610px;
+      height: 563px;
+      overflow: hidden;
+      box-shadow: 0 40px 120px -30px rgba(0, 0, 0, 0.88);
+    }
+    .revbox img {
+      position: absolute;
+      left: -62.7px;
+      top: -91.5px;
+      display: block;
+      width: 1050.3px;
+      height: 728.4px;
+    }
+    .r2rect {
+      position: absolute;
+      left: 6px;
+      top: 247px;
+      width: 598px;
+      height: 156px;
+      border: 1.5px solid var(--accent);
+      border-radius: 4px;
+      opacity: 0;
+    }
+
+    .flash {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      z-index: 20;
+    }
+
+    .reload {
+      position: absolute;
+      left: 120px;
+      top: 592px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+    }
+    .reload i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+  </style>
+
+  <div id="root" data-composition-id="h4" data-width="1920" data-height="1080">
+    <div class="grid-surface"></div>
+
+    <div class="topline">
+      <div class="brand mono">ACRYL AXI <span>· how a round works</span></div>
+      <div class="rail"><i class="past"></i><i class="past"></i><i class="past"></i><i class="on"></i><i></i><i></i><i></i></div>
+    </div>
+
+    <div class="clip" id="h4-filewrap" data-start="0" data-duration="7.5" style="position: absolute; inset: 0">
+      <div class="file" id="h4-file">
+        <div class="file-head">
+          <div><b>plan.html</b> · revision</div>
+          <div class="r2">r2</div>
+        </div>
+        <div class="file-body">
+          <div class="dl chg" id="h4-l1"><span class="m">~</span>&lt;p&gt;shell paints first, the payload follows&lt;/p&gt;</div>
+          <div class="dl add" id="h4-l2"><span class="m">+</span>&lt;section id="decision"&gt;<span class="cm"> … &lt;/section&gt;</span></div>
+          <div class="dl add" id="h4-l3"><span class="m">+</span>&lt;section id="whiteboard"&gt;<span class="cm"> … &lt;/section&gt;</span></div>
+          <div class="dl" id="h4-l4"><span class="cm">  &lt;!-- review round r2 --&gt;</span></div>
+        </div>
+        <div class="file-foot" id="h4-saved"><i></i>saved · local file</div>
+      </div>
+      <div class="reload" id="h4-reload"><i></i>page reloaded · review kept</div>
+    </div>
+
+    <div class="clip revbox" id="h4-rev" data-start="0.3" data-duration="7.2">
+      <img src="assets/media/revisions.png" alt="" data-layout-allow-overflow />
+      <div class="r2rect" id="h4-ring"></div>
+    </div>
+
+    <div class="flash" id="h4-flash"></div>
+
+    <div class="clip capband" id="h4-band" data-start="0" data-duration="7.5">
+      <div class="cap">
+        <div class="eyebrow" id="h4-eyebrow">04 · reload</div>
+        <div class="cap-line" id="h4-line">The file changes. The review <em>reloads</em>.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#h4-band", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+      tl.fromTo("#h4-eyebrow", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.05);
+      tl.fromTo("#h4-line", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 0.12);
+
+      // the edit lands in the file
+      tl.fromTo("#h4-file", { opacity: 1, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0);
+      tl.fromTo("#h4-l1", { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, 0.45);
+      tl.fromTo("#h4-l2", { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, 0.75);
+      tl.fromTo("#h4-l3", { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, 1.0);
+      tl.fromTo("#h4-l4", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.25);
+      tl.fromTo("#h4-saved", { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 1.45);
+
+      // the revisions legend arrives
+      tl.fromTo("#h4-rev", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.3);
+
+      // the page reloads: a flash, then the revision is marked
+      tl.fromTo("#h4-flash", { opacity: 0 }, { opacity: 0.42, duration: 0.09, yoyo: true, repeat: 1, ease: "power1.inOut" }, 2.5);
+      tl.fromTo("#h4-reload", { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 2.75);
+      tl.fromTo("#h4-ring", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 3.15);
+
+      // slow drift on both cards
+      tl.fromTo("#h4-rev", { x: 0 }, { x: -10, duration: 3.6, ease: "sine.inOut", immediateRender: false }, 3.6);
+      tl.fromTo("#h4-file", { y: 0 }, { y: -6, duration: 3.6, ease: "sine.inOut", immediateRender: false }, 3.7);
+
+      window.__timelines["h4"] = tl;
+    })();
+  </script>
+</template>

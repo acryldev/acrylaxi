@@ -1,0 +1,175 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: var(--sans);
+      color: var(--fg);
+    }
+    .glow {
+      position: absolute;
+      left: 50%;
+      top: 96px;
+      width: 520px;
+      height: 520px;
+      margin-left: -260px;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(95, 216, 224, 0.11) 0%,
+        rgba(180, 120, 255, 0.06) 34%,
+        rgba(0, 0, 0, 0) 70%
+      );
+      transform-origin: 50% 50%;
+    }
+    .mark {
+      position: absolute;
+      left: 50%;
+      top: 128px;
+      width: 148px;
+      height: 148px;
+      margin-left: -74px;
+      object-fit: contain;
+      transform-origin: 50% 50%;
+    }
+    .word {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 320px;
+      text-align: center;
+      font-family: var(--sans);
+      font-size: 92px;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1;
+      color: var(--fg);
+      white-space: nowrap;
+    }
+    .word span {
+      display: inline-block;
+    }
+    .word .sp {
+      width: 0.2em;
+    }
+    .url {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 448px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 26px;
+      letter-spacing: 0.01em;
+      color: var(--fg-2);
+    }
+    .rule {
+      position: absolute;
+      left: 50%;
+      top: 500px;
+      width: 128px;
+      height: 3px;
+      margin-left: -64px;
+      background: var(--spectrum);
+      transform-origin: 50% 50%;
+    }
+    .install {
+      position: absolute;
+      left: 50%;
+      top: 560px;
+      width: 900px;
+      margin-left: -450px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 2px;
+      padding: 22px 28px;
+    }
+    .install .head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .install .cmd {
+      font-family: var(--mono);
+      font-size: 22px;
+      color: var(--fg);
+      white-space: nowrap;
+    }
+    .install .cmd .p {
+      color: var(--accent);
+      margin-right: 12px;
+    }
+    .install .cmd .chip {
+      margin-left: 14px;
+      font-size: 17px;
+      color: var(--fg-2);
+      border: 1px solid var(--line);
+      padding: 2px 9px;
+    }
+    .credit {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 940px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 16px;
+      letter-spacing: 0.06em;
+      color: var(--fg-2);
+    }
+    .credit .sep {
+      color: var(--line);
+      margin: 0 8px;
+    }
+  </style>
+
+  <div id="root" data-composition-id="h7" data-width="1920" data-height="1080">
+    <div class="grid-surface"></div>
+
+    <div class="glow" id="h7-glow"></div>
+    <img class="mark" id="h7-mark" src="assets/acrylaxi-mark.png" alt="ACRYL AXI" />
+
+    <div class="word" id="h7-word">
+      <span>A</span><span>C</span><span>R</span><span>Y</span><span>L</span><span class="sp"></span><span>A</span
+      ><span>X</span><span>I</span>
+    </div>
+    <div class="url" id="h7-url">acryl.dev/acrylaxi</div>
+    <div class="rule" id="h7-rule"></div>
+
+    <div class="install" id="h7-install">
+      <div class="head"><span>install</span><span>any agent</span></div>
+      <div class="cmd"><span class="p">$</span>npx skills add acryldev/acrylaxi --skill acrylaxi<span class="chip">/acrylaxi</span></div>
+    </div>
+
+    <div class="credit" id="h7-credit">
+      Extended from Lavish Editor by Kun Chen<span class="sep">·</span>MIT
+    </div>
+
+    <div class="clip" id="h7-hold" data-start="0" data-duration="5.5" style="position: absolute; inset: 0"></div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#h7-glow", { opacity: 1, scale: 0.86 }, { opacity: 1, scale: 1, duration: 1.0, ease: "power2.out" }, 0);
+      tl.fromTo("#h7-mark", { opacity: 1, scale: 0.9, y: 12 }, { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0);
+      tl.fromTo("#h7-word span", { opacity: 1, y: 34 }, { opacity: 1, y: 0, duration: 0.55, stagger: 0.045, ease: "power3.out" }, 0.2);
+      tl.fromTo("#h7-url", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 1.1);
+      tl.fromTo("#h7-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.inOut" }, 1.35);
+      tl.fromTo("#h7-install", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 1.8);
+      tl.fromTo("#h7-credit", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 2.6);
+
+      // one slow breath so the last hold is never frozen
+      tl.fromTo("#h7-glow", { scale: 1 }, { scale: 1.05, duration: 2.9, ease: "sine.inOut", immediateRender: false }, 2.8);
+
+      window.__timelines["h7"] = tl;
+    })();
+  </script>
+</template>

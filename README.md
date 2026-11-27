@@ -138,6 +138,11 @@ pnpm link
 └────────────────────────┘
 ```
 
+Prefer motion? [How a round works](marketing/renders/acrylaxi-how-it-works.gif) is a 49-second
+animation of one real round: the artifact opens, an annotation lands, the poll returns prompts,
+the file changes and the review reloads. It is rendered from the real product screenshots by
+[the HyperFrames project](marketing/how-it-works/README.md).
+
 ## Capabilities
 
 ### Artifact handling

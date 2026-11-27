@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ACRYL AXI — how a review round works</title>
+    <link rel="stylesheet" href="assets/brand.css" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      #root > [data-composition-src] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="49.5"
+      data-width="1920"
+      data-height="1080"
+      data-fps="30"
+    >
+      <div
+        id="h1"
+        data-composition-id="h1"
+        data-composition-src="compositions/h1-open.html"
+        data-start="0"
+        data-duration="5.5"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="h2"
+        data-composition-id="h2"
+        data-composition-src="compositions/h2-annotate.html"
+        data-start="5.5"
+        data-duration="9"
+        data-track-index="2"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="h3"
+        data-composition-id="h3"
+        data-composition-src="compositions/h3-poll.html"
+        data-start="14.5"
+        data-duration="9.5"
+        data-track-index="3"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="h4"
+        data-composition-id="h4"
+        data-composition-src="compositions/h4-reload.html"
+        data-start="24"
+        data-duration="8"
+        data-track-index="4"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="h5"
+        data-composition-id="h5"
+        data-composition-src="compositions/h5-whiteboard.html"
+        data-start="32"
+        data-duration="6.5"
+        data-track-index="5"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="h6"
+        data-composition-id="h6"
+        data-composition-src="compositions/h6-also.html"
+        data-start="38.5"
+        data-duration="5.5"
+        data-track-index="6"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="h7"
+        data-composition-id="h7"
+        data-composition-src="compositions/h7-lockup.html"
+        data-start="44"
+        data-duration="5.5"
+        data-track-index="7"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>
