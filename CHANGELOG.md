@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.1](https://github.com/acryldev/acrylaxi/compare/acrylaxi-v0.1.0...acrylaxi-v0.1.1) (2026-11-27)
+
+
+### Features
+
+* productize lavish-axi as ACRYL AXI (acrylaxi) ([73c3210](https://github.com/acryldev/acrylaxi/commit/73c3210c33987cef8af3e2968518ebac5f4b3f42))
+* **skill:** prefer an installed acrylaxi binary, npx as fallback ([e647f31](https://github.com/acryldev/acrylaxi/commit/e647f3126082a327a3105393133044413b65f900))
+
+## Changelog
+
 ACRYL AXI is a fork of [Lavish Editor / `lavish-axi`](https://github.com/kunchenguid/lavish-axi) by Kun Chen, MIT-licensed. This repository starts at an import of the upstream **v0.1.99** tree and renames the product to ACRYL AXI.
 
 Upstream's release history lives upstream and is not repeated here:
